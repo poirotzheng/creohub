@@ -1,0 +1,1 @@
+{"manifestVersion":2,"id":"good-pointer","name":"Good Pointer","version":"1.0.0","adapter":"ptk-sync","entry":"bin/pkg.dll","textDir":"text","commands":[{"id":"good-pointer.one","title":"T good-pointer.one","desc":"d","descForLLM":"llm","risk":"safe","inputSchema":{"type":"object","properties":{}}}]}

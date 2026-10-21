@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "creohub": {
+      "command": "cmd",
+      "args": ["/c", "node", "<REPO_ROOT>\\bridge\\bridge.mjs"],
+      "env": {
+        "CREO_HUB_ROOT": "<REPO_ROOT>"
+      }
+    }
+  }
+}

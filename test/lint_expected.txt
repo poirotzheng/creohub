@@ -1,0 +1,25 @@
+# creo-hub D5 golden verdicts: <dir> <OK|UNSUPPORTED|INVALID> <reasonKeyword|->
+# shared by manifest_lint.mjs (node) and registry.c (C, v2_manifest_test D5 phase)
+good-classic OK -
+good-v2-full OK -
+good-pointer OK -
+bad-syntax INVALID syntax
+bad-noid INVALID id
+bad-mv INVALID manifestVersion
+bad-adapter UNSUPPORTED adapter
+bad-risk INVALID risk
+bad-schema INVALID inputSchema
+bad-ns INVALID must start with
+bad-entry INVALID entry
+bad-textdir INVALID textDir
+bad-timeout INVALID timeoutSec
+bad-context INVALID context
+bad-requires INVALID requires
+bad-mismatch INVALID pointer id
+bad-ptrver INVALID plugin.json missing
+bad-verchars INVALID invalid version chars
+good-v2-m4 OK -
+bad-async INVALID async
+bad-undo-self INVALID must not reference itself
+bad-undo-missing INVALID not found
+bad-group INVALID group

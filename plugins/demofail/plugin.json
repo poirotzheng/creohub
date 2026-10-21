@@ -1,0 +1,13 @@
+{
+  "manifestVersion": 1,
+  "id": "demofail",
+  "name": "Demo FailVer",
+  "version": "0.1.0",
+  "adapter": "ptk-sync",
+  "entry": "bin/demo_fail.dll",
+  "textDir": "text",
+  "userDisplay": true,
+  "autoMount": false,
+  "commands": [],
+  "host": { "creo": "6.0" }
+}

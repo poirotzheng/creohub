@@ -1,0 +1,10 @@
+{
+  "baseURL": "http://127.0.0.1:11434/v1",
+  "apiKey": "local-no-key",
+  "model": "qwen2.5-7b-instruct",
+  "temperature": 0.2,
+  "maxRounds": 6,
+  "maxTokens": 1024,
+  "jobPollMs": 60000,
+  "toolMode": "native"
+}

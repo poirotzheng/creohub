@@ -1,0 +1,13 @@
+{
+  "name": "creo-hub-dsh-bundle",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Optional DSH bundle: inserts the creo-hub MCP client entry into a DSH profile.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "dsh": {
+    "bundle": {
+      "patch": "dsh.bundle.patch.yml"
+    }
+  }
+}

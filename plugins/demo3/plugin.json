@@ -1,0 +1,97 @@
+{
+  "manifestVersion": 2,
+  "id": "demo3",
+  "name": "Demo3 Command Face (M3a)",
+  "version": "0.1.0",
+  "adapter": "ptk-sync",
+  "entry": "bin/demo3.dll",
+  "textDir": "text",
+  "userDisplay": true,
+  "autoMount": false,
+  "commands": [
+    {
+      "id": "demo3.echo",
+      "title": "Echo text",
+      "desc": "Echo msg back with byte length (E11 roundtrip probe)",
+      "descForLLM": "Read-only channel probe: returns {echo,bytes} for the given msg string. Use it to verify the hub call channel end to end. Safe to retry; no model state touched.",
+      "risk": "safe",
+      "idempotent": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "msg": { "type": "string", "description": "text to echo back (UTF-8, any content)" }
+        },
+        "required": ["msg"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "demo3.slow",
+      "title": "Slow sleep",
+      "desc": "Sleep sec seconds on the Creo main thread (E11-8 timeout honesty)",
+      "descForLLM": "Test-only blocking probe: sleeps sec seconds ON THE CREO MAIN THREAD, blocking every other hub operation meanwhile. Manifest timeoutSec is 2, so sec=5 demonstrates the 504 report-don't-kill timeout path. Never call in production sessions.",
+      "risk": "safe",
+      "idempotent": true,
+      "timeoutSec": 2,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "sec": { "type": "number", "description": "seconds to sleep (0<sec<=25)" }
+        },
+        "required": ["sec"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "demo3.fail",
+      "title": "Deliberate failure",
+      "desc": "Always fails with err_code P3_FAIL (E11-7 business-failure envelope)",
+      "descForLLM": "Always returns ok:false err_code=P3_FAIL - exercises the business-failure envelope and the confirm gate. Takes no arguments; failure is the expected result, do not retry.",
+      "risk": "confirm",
+      "idempotent": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "demo3.boom",
+      "title": "Create prism feature",
+      "desc": "Create a 12x10x8 prism import feature in the active part (E11-9 real change)",
+      "descForLLM": "DESTRUCTIVE model change: creates a real 12x10x8 prism import feature named 'name' in the ACTIVE PART (a part must be open). Not reversible via API - undo only by manual feature delete in Creo. Used to prove PTK change APIs work through the hub main-thread call channel.",
+      "risk": "destructive",
+      "context": "part",
+      "reversible": false,
+      "idempotent": false,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string", "description": "new feature name (<=60 chars)" }
+        },
+        "required": ["name"],
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "demo3.longtask",
+      "title": "Async long task (progress demo)",
+      "desc": "N sleep steps on the Creo main thread; /call returns 202 + jobId (M4b async)",
+      "descForLLM": "M4b async demo: runs steps x ms sleeping steps ON THE CREO MAIN THREAD and reports progress through the job slot. /call answers 202 {jobId,poll} immediately; poll GET /api/v1/jobs/<id> (or the creo_hub_job tool) for state/pct/result. The main thread stays busy meanwhile - other PTK calls queue. Never call in production sessions.",
+      "risk": "safe",
+      "idempotent": true,
+      "async": true,
+      "timeoutSec": 60,
+      "group": "demo",
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "steps": { "type": "number", "description": "number of steps (1..50, default 10)" },
+          "ms": { "type": "number", "description": "sleep per step in ms (0..1000, default 200)" }
+        },
+        "additionalProperties": false
+      }
+    }
+  ],
+  "host": { "creo": "6.0" }
+}

@@ -1,0 +1,1 @@
+{"manifestVersion":2,"id":"bad-context","adapter":"ptk-sync","entry":"bin/pkg.dll","textDir":"text","commands":[{"id":"bad-context.go","title":"T bad-context.go","desc":"d","descForLLM":"llm","risk":"safe","inputSchema":{"type":"object","properties":{}},"context":"space"}]}

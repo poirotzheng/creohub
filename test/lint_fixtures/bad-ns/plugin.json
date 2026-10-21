@@ -1,0 +1,1 @@
+{"manifestVersion":2,"id":"bad-ns","adapter":"ptk-sync","entry":"bin/pkg.dll","textDir":"text","commands":[{"id":"wrong.prefix","title":"T wrong.prefix","desc":"d","descForLLM":"llm","risk":"safe","inputSchema":{"type":"object","properties":{}}}]}

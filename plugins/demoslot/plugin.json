@@ -1,0 +1,12 @@
+{
+  "manifestVersion": 1,
+  "id": "demoslot",
+  "name": "DemoSlot Dirty-Unload Probe (M3a E12)",
+  "version": "0.1.0",
+  "adapter": "ptk-sync",
+  "entry": "bin/demoslot.dll",
+  "textDir": "text",
+  "userDisplay": true,
+  "autoMount": false,
+  "host": { "creo": "6.0" }
+}

@@ -1,0 +1,23 @@
+{
+  "manifestVersion": 2,
+  "id": "tpl",
+  "name": "Template Package (rename me)",
+  "version": "0.1.0",
+  "adapter": "ptk-sync",
+  "entry": "bin/tpl.dll",
+  "textDir": "text",
+  "commands": [
+    {
+      "id": "tpl.status",
+      "title": "Template status (read-only)",
+      "desc": "只读诊断：返回包名/SDK 版本/执行预算（铁律 2 的最小命令）。",
+      "descForLLM": "Read-only, no side effects, safe to retry. Returns {package, sdk_version, budget_ms}. Use as the connectivity smoke test after mount.",
+      "risk": "safe",
+      "inputSchema": { "type": "object", "properties": {} },
+      "timeoutSec": 2,
+      "context": "any",
+      "reversible": true,
+      "idempotent": true
+    }
+  ]
+}

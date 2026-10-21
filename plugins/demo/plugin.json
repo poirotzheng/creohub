@@ -1,0 +1,13 @@
+{
+  "manifestVersion": 1,
+  "id": "demo",
+  "name": "Demo Plugin",
+  "version": "0.1.0",
+  "adapter": "ptk-sync",
+  "entry": "bin/demo.dll",
+  "textDir": "text",
+  "userDisplay": true,
+  "autoMount": true,
+  "commands": [ { "id": "demo.hello", "label": "Say Hello" } ],
+  "host": { "creo": "6.0" }
+}

@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>creo-hub 跨源拦截实证页（P11）</title>
+<style>
+body { background:#0d1117; color:#e6edf3; font-family:"Segoe UI","Microsoft YaHei",sans-serif; padding:24px; font-size:14px; }
+h1 { font-size:18px; } h2 { font-size:15px; margin-top:22px; color:#58a6ff; }
+.case { background:#161b22; border:1px solid #30363d; border-radius:8px; padding:12px 16px; margin:10px 0; }
+.r { color:#f85149; } .g { color:#3fb950; } .y { color:#d29922; }
+.mono { font-family:Consolas,monospace; font-size:12px; color:#8b949e; }
+button { background:#21262d; color:#e6edf3; border:1px solid #30363d; padding:6px 14px; border-radius:6px; cursor:pointer; font-size:13px; }
+</style>
+</head>
+<body>
+<h1>creo-hub 跨源拦截实证页（docs\17 P11 专用）</h1>
+<p>本页必须以 <span class="mono">file://</span> 双击打开（模拟"浏览器恶意页"＝与 hub 不同源）。
+先在 Creo 里启动 hub 并记下端口（默认 8765），在下方填入后逐项点击。
+<b>预期：三项全部被浏览器拦截</b>——这正是九层安全 L4/L5（强制 JSON+自定义头触发 CORS 预检；服务器从不回
+Access-Control-Allow-* 头）的设计效果。同时观察 hub 日志：第 1 项可能留下 <span class="mono">REJECT(unauthorized)</span>
+审计行（请求到达但响应不可读），第 2/3 项连预检都被拒（405/无 CORS 头），正式请求根本不会发出。</p>
+<p>端口：<input id="port" value="8765" size="6" class="mono">
+&nbsp;令牌（从面板地址栏一闪而过的 URL 或 hub_token.txt 抄来，仅第 2/3 项用）：
+<input id="tok" value="" size="34" class="mono"></p>
+
+<h2>① 简单 GET（无自定义头 → 不触发预检，但响应应不可读）</h2>
+<div class="case">
+  <button onclick="t1()">运行：GET /api/v1/plugins（无令牌）</button>
+  <div id="r1" class="mono">未运行</div>
+  <p>预期：控制台报 CORS 错误；下方显示 <span class="r">响应不可读（拦截成功）</span>。
+     即便服务器回了 401 JSON，浏览器也拒绝把内容交给本页脚本。</p>
+</div>
+
+<h2>② 带令牌头的 GET（X-Hub-Token → 必触发预检 OPTIONS）</h2>
+<div class="case">
+  <button onclick="t2()">运行：GET /api/v1/plugins（带令牌头）</button>
+  <div id="r2" class="mono">未运行</div>
+  <p>预期：预检 OPTIONS 被服务器 405 拒绝且无 Access-Control-Allow-* → 浏览器直接拦截，
+     <b>正式请求不会发出</b>（hub 日志无此 GET）。</p>
+</div>
+
+<h2>③ 变更操作 POST（application/json → 必触发预检）</h2>
+<div class="case">
+  <button onclick="t3()">运行：POST /api/v1/mount {"id":"demo2"}（带令牌头）</button>
+  <div id="r3" class="mono">未运行</div>
+  <p>预期：同②，预检被拒，挂载请求根本到不了 hub——<b>恶意网页无法操纵插件</b>。</p>
+</div>
+
+<h2>结果汇总</h2>
+<div class="case" id="sum">尚未运行。</div>
+
+<script>
+/* ES5，仅用于安全实证；结果同时打到页面与浏览器控制台（F12） */
+var results = { t1: null, t2: null, t3: null };
+function base() { return "http://127.0.0.1:" + (document.getElementById("port").value || "8765") + "/api/v1"; }
+function tok() { return document.getElementById("tok").value; }
+function show(id, blocked, detail) {
+  results[id] = blocked;
+  document.getElementById("r" + id.substring(1)).innerHTML = blocked
+    ? '<span class="r">■ 拦截成功：</span>' + detail
+    : '<span class="y">▲ 未拦截（异常！请记录并报告）：</span>' + detail;
+  summarize();
+}
+function summarize() {
+  var n = 0, blocked = 0, ran = 0;
+  for (var k in results) { n++; if (results[k] !== null) { ran++; if (results[k]) blocked++; } }
+  document.getElementById("sum").innerHTML = ran === 0 ? "尚未运行。"
+    : (ran + " 项已运行，" + blocked + " 项被拦截。" +
+       (ran === n && blocked === n
+         ? ' <span class="g">全部拦截 —— P11 判定：通过（浏览器同源策略 + hub 无 CORS 头双保险生效）</span>'
+         : (ran === n ? ' <span class="r">存在未拦截项 —— P11 判定：不通过，请截图报告</span>' : "")));
+}
+function run(id, method, path, headers, body) {
+  var x = new XMLHttpRequest();
+  try {
+    x.open(method, base() + path, true);
+    for (var k in headers) x.setRequestHeader(k, headers[k]);
+    x.onreadystatechange = function () {
+      if (x.readyState === 4) {
+        if (x.status === 0)
+          show(id, true, "请求被浏览器阻断（status=0，CORS/预检拦截）");
+        else
+          show(id, false, "竟然读到了响应 status=" + x.status + " body=" + x.responseText.substring(0, 120));
+      }
+    };
+    x.onerror = function () { show(id, true, "网络层错误（被拦截）"); };
+    x.send(body || null);
+  } catch (e) {
+    show(id, true, "脚本层异常（被拦截）：" + e.message);
+  }
+}
+function t1() { run("t1", "GET", "/plugins", {}); }
+function t2() { run("t2", "GET", "/plugins", { "X-Hub-Token": tok() }); }
+function t3() { run("t3", "POST", "/mount", { "X-Hub-Token": tok(), "Content-Type": "application/json" }, '{"id":"demo2"}'); }
+</script>
+</body>
+</html>

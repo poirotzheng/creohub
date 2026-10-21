@@ -1,0 +1,12 @@
+Demo2MenuLabel
+DEMO2 M1
+#
+#
+Demo2BtnLabel
+Say Hello 2
+#
+#
+Demo2BtnHelp
+Verify demo2 plugin command works (E3 concurrency)
+#
+#

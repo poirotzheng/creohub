@@ -1,0 +1,23 @@
+---
+name: Feature request
+about: Suggest a capability or integration
+title: "[feature] "
+labels: ["enhancement"]
+assignees: []
+---
+
+## Problem
+
+<!-- What are you trying to do that creo-hub makes hard today? -->
+
+## Proposed solution
+
+## Alternatives considered
+
+## Environment / constraint
+
+<!-- Creo version, air-gapped?, Windows version, plugin ecosystem, AI host (DSH/Claude/Cursor). -->
+
+## Does this require new plugin APIs or changes to the command contract?
+
+<!-- If yes, describe the command surface you would expect. -->

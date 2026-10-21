@@ -1,0 +1,1472 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>creo-hub M3b 面板</title>
+<style>
+/* ============================================================
+ * creo-hub M2 面板样式（09 §2.4 视觉规范，保守 CSS：无 flex/grid/
+ * CSS 变量，IE11 与 Chrome 109 双基线；全部颜色硬编码）
+ * 背景 #0d1117 卡片 #161b22 边框 #30363d 文字 #e6edf3
+ * 强调 #58a6ff 绿 #3fb950 黄 #d29922 红 #f85149 紫 #bc8cff
+ * ============================================================
+ * M3e 视觉精修（2026-10-13，参考 DSH/GitHub-dark 观感）：仍守保守 CSS
+ * 纪律（无 flex/grid/CSS 变量）；新增 color-scheme:dark 让原生控件
+ * （select/checkbox/滚动条）走暗色渲染、按钮渐变+focus 环、卡片悬浮
+ * 阴影、下划线式选项卡、自定义滚动条——纯观感，零功能/零 id 变更。
+ * ============================================================ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  background: #0d1117; color: #e6edf3;
+  font-family: "Segoe UI", "Microsoft YaHei", Tahoma, sans-serif;
+  font-size: 14px; line-height: 1.5;
+  color-scheme: dark;                 /* 原生控件暗色渲染（Chrome/Edge；IE 忽略） */
+  -webkit-font-smoothing: antialiased;
+}
+::selection { background: #1f6feb55; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #30363d; border-radius: 5px;
+                            border: 2px solid #0d1117; }
+::-webkit-scrollbar-thumb:hover { background: #484f58; }
+.mono { font-family: Consolas, "Courier New", monospace; }
+
+/* ---------- 顶栏 ---------- */
+#topbar {
+  background: linear-gradient(180deg, #1a2029 0%, #161b22 100%);
+  border-bottom: 1px solid #30363d;
+  padding: 12px 20px; position: relative; overflow: hidden;
+  box-shadow: 0 1px 0 rgba(255,255,255,.03) inset, 0 2px 8px rgba(1,4,9,.45);
+}
+#topbar h1 { font-size: 17px; font-weight: 600; display: inline-block; vertical-align: middle;
+             letter-spacing: .2px; }
+#topbar h1 .ver { color: #58a6ff; }
+#stats { display: inline-block; margin-left: 18px; color: #8b949e; vertical-align: middle;
+         font-size: 13px; letter-spacing: .1px; }
+#stats b { color: #e6edf3; font-weight: 600; }
+#stats .g { color: #3fb950; } #stats .y { color: #d29922; } #stats .r { color: #f85149; }
+#topBtns { float: right; margin-top: 2px; }
+.dot { display: inline-block; width: 8px; height: 8px; border-radius: 4px;
+       background: #3fb950; margin-right: 5px; vertical-align: middle;
+       box-shadow: 0 0 6px #3fb95088; }
+.dot.off { background: #f85149; box-shadow: 0 0 6px #f8514988; }
+
+button {
+  background: linear-gradient(180deg, #2a313b 0%, #21262d 100%);
+  color: #e6edf3; border: 1px solid #363d47;
+  padding: 5px 14px; margin-left: 6px; cursor: pointer; font-size: 13px;
+  border-radius: 6px; font-family: inherit; vertical-align: middle;
+  transition: border-color .12s, color .12s, background .12s, box-shadow .12s;
+  box-shadow: 0 1px 0 rgba(255,255,255,.04) inset;
+}
+button:hover { border-color: #58a6ff; color: #58a6ff; }
+button:active { background: #1c2128; box-shadow: none; }
+button:focus { outline: 2px solid #1f6feb55; outline-offset: 1px; }
+button:disabled { color: #484f58; border-color: #21262d; cursor: default;
+                  background: #161b22; box-shadow: none; }
+button.primary { border-color: #1f6feb; background: linear-gradient(180deg, #2f81f7 0%, #1f6feb 100%);
+                 color: #fff; font-weight: 600; }
+button.primary:hover { border-color: #58a6ff; background: linear-gradient(180deg, #4493f8 0%, #2f81f7 100%);
+                       color: #fff; }
+button.danger:hover { border-color: #f85149; color: #f85149; }
+select {
+  background: #21262d; color: #e6edf3; border: 1px solid #363d47;
+  border-radius: 6px; padding: 4px 8px; font-size: 13px; font-family: inherit;
+  vertical-align: middle; transition: border-color .12s;
+}
+select:hover, select:focus { border-color: #58a6ff; outline: none; }
+input[type=checkbox] { vertical-align: middle; width: 14px; height: 14px; }
+
+/* ---------- 横幅 ---------- */
+#banner {
+  display: none; padding: 9px 16px; font-size: 13px;
+  background: #3d1418; border-bottom: 1px solid #f85149; color: #f85149;
+}
+#banner.warn { background: #3d2e10; border-color: #d29922; color: #d29922; }
+#banner.show { display: block; }
+
+/* ---------- 选项卡（下划线式，DSH 观感） ---------- */
+#tabs { padding: 6px 20px 0 20px; background: #0d1117; border-bottom: 1px solid #30363d; }
+.tab {
+  display: inline-block; padding: 8px 16px 9px 16px; cursor: pointer; color: #8b949e;
+  border: none; border-bottom: 2px solid transparent; border-radius: 0;
+  font-size: 14px; margin-right: 6px; margin-bottom: -1px; background: none;
+  transition: color .12s, border-color .12s;
+}
+.tab:hover { color: #e6edf3; border-color: transparent; border-bottom-color: #30363d; }
+.tab.active { color: #58a6ff; background: none; border-color: transparent;
+              border-bottom-color: #58a6ff; font-weight: 600; }
+
+/* ---------- 主区 ---------- */
+#main { padding: 16px 20px 10px 20px; }
+#jobsBar { display:none; padding:6px 20px; background:#0d1117; border-bottom:1px solid #30363d;
+  font-size:12px; color:#8b949e; }
+#jobsBar .jlabel { color:#58a6ff; font-weight:600; margin-right:8px; }
+#jobsBar .job { margin-right:14px; white-space:nowrap; }
+#jobsBar .jbar { display:inline-block; width:70px; height:6px; background:#21262d; border-radius:3px;
+  vertical-align:middle; margin:0 4px; overflow:hidden; }
+#jobsBar .jfill { display:block; height:6px; background:#3fb950; }
+#jobsBar .jfill.ind { background:#d29922; width:30% !important; }
+.view { display: none; }
+.view.active { display: block; }
+
+/* ---------- M4d 对话 tab ---------- */
+.chatwrap { max-width: 920px; margin: 0 auto; display: flex; flex-direction: column; gap: 8px; }
+.chatlog { min-height: 240px; max-height: 56vh; overflow: auto; background: #0d1117;
+  border: 1px solid #30363d; border-radius: 8px; padding: 10px; }
+.chatempty { color: #8b949e; font-size: 12px; line-height: 1.7; }
+.msg { margin: 8px 0; font-size: 13px; line-height: 1.6; white-space: pre-wrap; word-break: break-word; }
+.msg.u { color: #e6edf3; }
+.msg.a { color: #c9d1d9; border-left: 2px solid #3fb950; padding-left: 8px; }
+.msg.sys { color: #8b949e; font-size: 12px; }
+.msg.err { color: #f85149; }
+.chatneed { border: 1px solid #d29922; background: #3d2c05; color: #e3b341;
+  padding: 8px 10px; border-radius: 6px; font-size: 12px; }
+.chatinput textarea { width: 100%; box-sizing: border-box; background: #0d1117; color: #e6edf3;
+  border: 1px solid #30363d; border-radius: 6px; padding: 8px; font: inherit; resize: vertical; }
+.chatrow { margin-top: 6px; display: flex; align-items: center; gap: 10px; }
+.chatcfg { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.chatcfgform { width: 100%; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center;
+  background: #0d1117; border: 1px solid #30363d; border-radius: 8px; padding: 10px; font-size: 12px; }
+.chatcfgform label { color: #8b949e; display: flex; align-items: center; gap: 6px; }
+.chatcfgform input, .chatcfgform select { background: #161b22; color: #e6edf3; border: 1px solid #30363d;
+  border-radius: 4px; padding: 4px 6px; font: inherit; }
+.chatcfgform input[type=text] { width: 240px; }
+.chatcfgform input[type=password] { width: 140px; }
+.chatcfgform input[type=number] { width: 60px; }
+
+/* ---------- 插件卡片 ---------- */
+.card {
+  background: linear-gradient(180deg, #171d26 0%, #161b22 100%);
+  border: 1px solid #30363d; border-radius: 10px;
+  padding: 14px 16px; margin-bottom: 12px; position: relative;
+  box-shadow: 0 1px 0 rgba(255,255,255,.03) inset;
+  transition: border-color .15s, box-shadow .15s;
+}
+.card:hover { border-color: #3d444d; box-shadow: 0 4px 14px rgba(1,4,9,.4),
+              0 1px 0 rgba(255,255,255,.03) inset; }
+.card.invalid { border-color: #f85149; }
+.card.tainted { border-color: #f85149; }
+.cardhead { overflow: hidden; }
+.pname { font-size: 15px; font-weight: 600; display: inline-block; vertical-align: middle;
+         letter-spacing: .1px; }
+.pid { color: #8b949e; margin-left: 8px; display: inline-block; vertical-align: middle; }
+.pver { color: #8b949e; margin-left: 8px; display: inline-block; vertical-align: middle; }
+.cardbtns { float: right; }
+.meta { color: #8b949e; font-size: 12px; margin-top: 8px; }
+.meta .mono { color: #7d8590; }
+.chip {
+  display: inline-block; background: #1c2128; border: 1px solid #30363d;
+  border-radius: 10px; padding: 0 9px; margin: 2px 4px 0 0; font-size: 11px; color: #8b949e;
+}
+.errline { color: #f85149; font-size: 12px; margin-top: 6px; }
+.okline  { color: #3fb950; font-size: 12px; margin-top: 6px; }
+
+/* ---------- 状态徽章（7 态，09 §2.4） ---------- */
+.badge {
+  display: inline-block; padding: 1px 10px; border-radius: 10px; font-size: 12px;
+  border: 1px solid; margin-left: 10px; vertical-align: middle; white-space: nowrap;
+}
+.b-active  { color: #3fb950; border-color: #2ea04366; background: #12261e; }
+.b-reg     { color: #8b949e; border-color: #30363d;    background: #1c2128; }
+.b-trans   { color: #58a6ff; border-color: #1f6feb66;  background: #101f33;
+             animation: pulse 1s linear infinite; }
+.b-error   { color: #d29922; border-color: #9e6a0366;  background: #251d0c; }
+.b-tainted { color: #f85149; border-color: #da363366;  background: #2d1214; }
+.b-invalid { color: #f85149; border-color: #da3633;    background: #2d1214; font-weight: 600; }
+.b-unsup   { color: #bc8cff; border-color: #8957e566;  background: #211534; }
+.b-fp      { color: #d29922; border-color: #9e6a0366;  background: #251d0c; margin-left: 6px; }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: .35; } 100% { opacity: 1; } }
+
+/* ---------- autoMount 开关 ---------- */
+.autoline { display: inline-block; margin-left: 12px; vertical-align: middle; color: #8b949e; font-size: 12px; }
+.autoline input { vertical-align: middle; margin-right: 3px; }
+
+/* ---------- 命令视图（G6 只读） ---------- */
+.cmdblock { margin-top: 10px; border-top: 1px dashed #30363d; padding-top: 8px; }
+table.cmds { width: 100%; border-collapse: collapse; font-size: 12px; }
+table.cmds th { color: #8b949e; text-align: left; font-weight: normal; padding: 3px 8px 3px 0;
+                border-bottom: 1px solid #30363d; white-space: nowrap; }
+table.cmds td { padding: 5px 8px 5px 0; border-bottom: 1px solid #21262d; vertical-align: top; }
+.risk { display: inline-block; padding: 0 8px; border-radius: 10px; font-size: 11px; border: 1px solid; }
+.r-safe  { color: #3fb950; border-color: #2ea04366; background: #12261e; }
+.r-conf  { color: #d29922; border-color: #9e6a0366; background: #251d0c; }
+.r-destr { color: #f85149; border-color: #da363366; background: #2d1214; }
+.llmdesc { color: #7d859e; font-style: italic; }
+pre.schema {
+  background: #0d1117; border: 1px solid #30363d; border-radius: 6px;
+  padding: 8px; font-size: 11px; color: #7d8590; overflow: auto; margin-top: 4px;
+  font-family: Consolas, "Courier New", monospace; max-height: 180px;
+}
+
+/* ---------- 日志控制台 ---------- */
+#logbar {
+  padding: 7px 20px; background: #161b22; border-top: 1px solid #30363d;
+  border-bottom: 1px solid #21262d; color: #8b949e; font-size: 12px; overflow: hidden;
+}
+#logbar b { color: #e6edf3; font-size: 13px; }
+#logbar button { float: right; padding: 2px 10px; font-size: 12px; }
+#logbox {
+  background: #010409; padding: 10px 20px; height: 210px; overflow-y: auto;
+  font-family: Consolas, "Courier New", monospace; font-size: 12px; color: #9ea7b3;
+  white-space: pre-wrap; word-break: break-all; line-height: 1.6;
+}
+#logbox .l-audit { color: #d29922; }
+#logbox .l-err   { color: #f85149; }
+#logbox .l-ok    { color: #3fb950; }
+
+/* ---------- 无令牌 / 助手占位 ---------- */
+#noToken { display: none; padding: 60px 20px; text-align: center; color: #8b949e; }
+#noToken h2 { color: #e6edf3; margin-bottom: 12px; font-weight: 600; }
+#noToken .mono { color: #58a6ff; }
+#viewChat .placeholder {
+  background: #161b22; border: 1px dashed #30363d; border-radius: 8px;
+  padding: 28px; color: #8b949e; text-align: center;
+}
+#viewChat .placeholder h3 { color: #58a6ff; font-weight: 600; margin-bottom: 10px; }
+#footer { padding: 8px 16px 14px 16px; color: #484f58; font-size: 11px; }
+
+/* ---------- b4 四件套①：确认抽屉（M3e Q2 P-1+P2 非模态化：428 待批工单，
+   confirmVia panel-required）。overlay 不再铺满挡面板：抽屉停靠右上、
+   可最小化；approved 票收细状态条（宽限倒计时），ISSUED 票才可操作。 ---------- */
+#cfmOverlay { display: none; position: fixed; right: 12px; top: 12px; z-index: 50;
+              pointer-events: none; }
+#cfmOverlay.show { display: block; }
+#cfmBox { position: relative; width: 470px; max-height: 72vh; overflow-y: auto;
+          background: #161b22; border: 1px solid #d29922; border-radius: 10px;
+          padding: 14px 16px; pointer-events: auto;
+          box-shadow: 0 12px 32px rgba(1,4,9,.65), 0 2px 8px rgba(1,4,9,.5); }
+#cfmBox.destr { border-color: #f85149; }
+#cfmBox.min { width: 320px; padding: 6px 10px; max-height: none; overflow: hidden; }
+#cfmBox.min #cfmList, #cfmBox.min #cfmHint { display: none; }
+#cfmTitle { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+#cfmHint { color: #8b949e; font-size: 12px; margin-bottom: 8px; }
+.cfmItem { border-top: 1px dashed #30363d; padding-top: 8px; margin-top: 8px; }
+.cfmMeta { color: #8b949e; font-size: 12px; margin-top: 4px; }
+.cfmCd { float: right; font-size: 13px; color: #d29922; }
+.cfmCd.urgent { color: #f85149; font-weight: 600; }
+.cfmApproved { color: #3fb950; font-size: 12px; margin-top: 4px; }
+.cfmSlimRow { color: #3fb950; font-size: 12px; }
+
+/* ---------- M3e Q1：操作者模式菜单（顶栏条；M2 武装时红横幅） ---------- */
+#opmodebar { padding: 6px 20px; font-size: 12px; color: #8b949e;
+             border-bottom: 1px solid #21262d;
+             background: linear-gradient(180deg, #10151c 0%, #0d1117 100%); }
+#opmodebar.armed2 { background: linear-gradient(180deg, #58151a 0%, #3d1013 100%);
+                    color: #ffb3b0; font-weight: 600;
+                    box-shadow: 0 0 12px rgba(248,81,73,.25) inset; }
+#opmodebar.armed1 { background: linear-gradient(180deg, #443308 0%, #2e2306 100%);
+                    color: #e3b341; box-shadow: 0 0 12px rgba(210,153,34,.18) inset; }
+#opmodebar select, #opmodebar button { font-size: 12px; margin: 0 6px 0 4px; }
+#opmodebar button { padding: 3px 12px; }
+#opmodebar .mono { color: inherit; }
+
+/* ---------- b4 四件套②：版本列 ---------- */
+.verline { margin-top: 6px; font-size: 12px; color: #8b949e; }
+.verline select {
+  background: #0d1117; color: #e6edf3; border: 1px solid #30363d;
+  border-radius: 4px; padding: 2px 4px; font-family: Consolas, monospace;
+  font-size: 12px; vertical-align: middle; margin: 0 4px;
+}
+.verline select:disabled { color: #484f58; }
+
+/* ---------- b4 R4：行色由操作结果驱动（ISSUE-C3，3s 内新鲜结果着色） ---------- */
+.card.flash-ok  { border-color: #3fb950; background: #12261e; }
+.card.flash-err { border-color: #f85149; background: #2d1214; }
+</style>
+</head>
+<body>
+
+<!-- 三段自诊断第 1 段：脚本被禁（企业策略/Edge 增强安全模式/IE 模式禁脚本）时，
+     下面全部不执行，本 noscript 是唯一可见提示 —— 别再静默停在"连接中…" -->
+<noscript>
+<div style="background:#f85149;color:#fff;padding:14px 18px;font-size:14px;line-height:1.8">
+  <b>浏览器已禁用/拦截 JavaScript —— creo-hub 面板无法工作。</b><br>
+  企业内网环境常见原因：Edge「增强安全模式」或 IE 模式、安全软件/扩展拦截内联脚本、
+  内网安全区域禁用了「活动脚本」。请改用 Chrome/Edge 普通模式，或调整策略后
+  从 Creo 菜单 Open Web Panel 重新打开。
+</div>
+</noscript>
+
+<!-- 三段自诊断第 2/3 段：独立小脚本块，先于主面板脚本执行。
+     onerror=主脚本崩溃可见化；watchdog=JS 活着但 health 无响应的排查指引。 -->
+<script>
+(function () {
+  function bar(color) {
+    var d = document.getElementById("jserr");
+    if (!d) {
+      d = document.createElement("div");
+      d.id = "jserr";
+      d.style.cssText = "padding:10px 16px;font-size:13px;line-height:1.6;white-space:pre-wrap;"
+        + "color:#fff;background:" + color;
+      if (document.body) document.body.insertBefore(d, document.body.firstChild);
+    }
+    return d;
+  }
+  window.onerror = function (msg, url, line) {
+    bar("#f85149").innerHTML =
+      "面板 JS 错误：" + String(msg).replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      + (line ? "（第 " + line + " 行）" : "");
+    return false;
+  };
+  window.setTimeout(function () {
+    var bn = document.getElementById("banner");
+    var nt = document.getElementById("noToken");
+    if (window.__hubAlive === true) return;                 /* health 已到，一切正常 */
+    if (nt && nt.style.display === "block") return;         /* 无令牌引导屏（正常状态） */
+    if (bn && bn.innerHTML !== "") return;                  /* 已有断连/401 横幅 */
+    if (document.getElementById("jserr")) return;           /* 已有错误条，不叠加 */
+    bar("#d29922").innerHTML =
+      "诊断：面板 JS 已在运行，但 4 秒内 health 探测无任何响应（请求未发出或被拦截）。"
+      + "请在终端运行 test\\probe_api.cmd &lt;端口&gt; 对照：probe 四段正常 = 浏览器拦截了面板"
+      + "请求（扩展/安全软件/Edge 模式）；probe 也不通 = hub 侧问题，请把 logs\\hub_m1.log"
+      + "发给开发者。";
+  }, 4000);
+})();
+</script>
+
+<!-- 断连/令牌横幅（09 §7：hub 断开 → 红色横幅 + 按钮禁用） -->
+<div id="banner"></div>
+
+<div id="topbar">
+  <h1>creo-hub <span class="ver">M3b</span></h1>
+  <span id="stats">连接中…</span>
+  <span id="topBtns">
+    <button id="btnRefresh" onclick="Hub.op('refresh',null)">Refresh Registry</button>
+    <button id="btnMountAll" class="primary" onclick="Hub.op('mount-all',null)">Mount All</button>
+    <button id="btnUnloadAll" class="danger" onclick="Hub.op('unload-all',null)">Unload All</button>
+  </span>
+</div>
+
+<div id="opmodebar">
+  操作者模式（M3e Q1，风险由操作者承担；纯内存、hub 重启回 M0）：
+  <select id="omMode" onchange="Hub.omModeChanged()">
+    <option value="0">M0 标准（confirm/destructive 均面板批）</option>
+    <option value="1">M1 会话信任（confirm 自动过票，destructive 恒面板）</option>
+    <option value="2">M2 限时无人（窗内 confirm+destructive 自动过票）</option>
+  </select>
+  <select id="omMin">
+    <option value="5">5min</option>
+    <option value="10" selected>10min</option>
+    <option value="30">30min</option>
+  </select>
+  <label id="omAckLbl" style="display:none"><input type="checkbox" id="omAck">
+    我知悉 M2 窗内 destructive 将无审批执行</label>
+  <button onclick="Hub.applyOpmode()">应用</button>
+  <span id="omStatus" class="mono"></span>
+</div>
+
+<div id="tabs">
+  <span class="tab active" id="tabPlugins" onclick="Hub.showView('plugins')">插件</span>
+  <span class="tab" id="tabChat" onclick="Hub.showView('chat')">助手（预留）</span>
+</div>
+
+<div id="jobsBar"></div>
+
+<div id="main">
+  <div class="view active" id="viewPlugins"><div id="cards"></div></div>
+  <div class="view" id="viewChat">
+    <div class="chatwrap">
+      <div id="chatLog" class="chatlog"><div class="chatempty">对话式操作 Creo（内网/本地 OpenAI 兼容模型）。先在「模型设置」里填好模型地址，再对话；confirm/destructive 命令需在面板确认抽屉批准。</div></div>
+      <div id="chatNeed" class="chatneed" style="display:none"></div>
+      <div class="chatcfg">
+        <button id="chatCfgBtn" onclick="Hub.chatCfgToggle()">模型设置</button>
+        <span id="chatCfgStatus" class="mono">未读取</span>
+        <div id="chatCfgForm" class="chatcfgform" style="display:none">
+          <label>baseURL <input id="cfgBase" type="text" placeholder="如 10.0.0.5:8000/v1"></label>
+          <label>模型 <input id="cfgModel" type="text" placeholder="deepseek-v4-flash"></label>
+          <label>apiKey <input id="cfgKey" type="password" placeholder="内网无鉴权则留空"></label>
+          <label>toolMode <select id="cfgTool"><option value="native">native（推荐）</option><option value="json">json（不支持 tools 时）</option></select></label>
+          <label>maxRounds <input id="cfgRounds" type="number" min="1" max="12" value="6"></label>
+          <button class="primary" onclick="Hub.chatCfgSave()">保存并测试</button>
+          <span id="cfgMsg" class="mono"></span>
+        </div>
+      </div>
+      <div class="chatinput">
+        <textarea id="chatText" rows="3" placeholder="例如：列出插件状态 / 挂载 demo3 / 查询 job j-1"></textarea>
+        <div class="chatrow"><button id="chatSend" class="primary" onclick="Hub.chatSend()">发送</button><span id="chatStatus" class="mono"></span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="noToken">
+  <h2>缺少访问令牌</h2>
+  <p>请从 Creo 菜单 <b>Utilities ▸ creo-hub ▸ Open Web Panel</b> 打开本面板，</p>
+  <p>令牌会随 URL 一次性交付（<span class="mono">/?token=…</span>），载入后即从地址栏清除。</p>
+  <p style="margin-top:10px">若 hub 已重启，旧令牌自动失效——同样请从菜单重新打开。</p>
+</div>
+
+<!-- b4 四件套①：确认对话框。数据源 = GET /api/v1/pending（2s 轮询）；
+     徽章红(destructive)/黄(confirm)、命令 summary、argsDigest 前 8 位、
+     批准/拒绝钮、60s 倒计时（remainingMs）；M3e S1b：approved 态改 10min 宽限窗
+     （分+秒显示"宽限"）。工单数据一律按索引回查
+     pendCache，永不进入内联 JS（与卡片同一注入纪律）。 -->
+<div id="cfmOverlay">
+  <div id="cfmBox">
+    <button id="cfmMinBtn" style="float:right" onclick="Hub.toggleCfmMin()">最小化</button>
+    <div id="cfmTitle">待确认命令</div>
+    <div id="cfmSlim" class="cfmSlimRow"></div>
+    <div id="cfmHint">以下命令按风险等级需人工批准：ISSUED 票 60 秒内未处理自动过期；批准后进入 10 分钟宽限窗等待调用方重试（M3e S1b 两段式）。拒绝立即释放工单。本抽屉非模态：展开时面板其余功能照常可用，可最小化。</div>
+    <div id="cfmList"></div>
+  </div>
+</div>
+
+<div id="logbar">
+  <b>日志</b> <span id="logmeta" class="mono"></span>
+  <button id="btnLogPause" onclick="Hub.toggleLogPause()">暂停</button>
+</div>
+<div id="logbox"></div>
+<div id="footer">creo-hub M3b · 127.0.0.1 回环专用 · v1 API · 令牌会话内有效 · 面板文件 web\index.html 热替换即生效</div>
+
+<script>
+/* =====================================================================
+ * creo-hub M2 面板逻辑 —— 严格 ES5（var/function，无箭头/let/const/
+ * fetch/Promise/模板字符串/class），XMLHttpRequest 2s 轮询。
+ * 安全细节：
+ *  - 令牌仅存 JS 内存（L3），载入即 history.replaceState 清 URL；
+ *  - 一切 API 数据经 esc() 转义后注入 DOM（插件元数据不可信）；
+ *  - 面板同源相对路径请求，无任何外部资源（O7+ 断网可用）。
+ * ===================================================================== */
+var Hub = (function () {
+  "use strict";
+
+  var API = "/api/v1";
+  var TOKEN = "";
+  var POLL_MS = 2000;
+
+  var connected = false;       /* 最近一次 health 成功 */
+  var tokenBad = false;        /* 401：令牌失效（hub 重启过） */
+  var logOffset = 0;
+  var logPaused = false;
+  var logLines = 0;
+  var LOG_CAP = 400;           /* DOM 行上限，超出裁顶部 */
+  var manifestCache = null;    /* G6 命令视图缓存（refresh 后失效） */
+  var manifestLoading = false; /* 防失败后每 2s 轮询风暴 */
+  var expanded = {};           /* 插件 id -> 命令视图展开态 */
+  var inflight = {};           /* 操作飞行中守卫：插件 id 或全局 op 名 */
+  var retries = {};            /* 503-busy 自动重试计数（上限 3，防骚扰） */
+  var lastList = [];           /* 最近一次 /plugins 列表（按钮按索引回查，
+                                  杜绝把插件 id 拼进内联 JS 的注入面） */
+  var lastError = {};          /* 插件 id / op 名 -> 最近失败信息 */
+  var lastOk = {};             /* 插件 id / op 名 -> 最近成功信息（短暂显示） */
+  var lastOkAt = {};           /* b4 R4: 结果时间戳 -> 3s 内行色由结果驱动 */
+  var lastErrAt = {};
+  var pendCache = [];          /* b4: 最近一次 /pending 工单（确认对话框按索引回查） */
+  var verPick = {};            /* b4 修复（真机 ISSUE-b4-1）：用户在版本下拉里的
+                                  进行中选择，id -> 版本串。2s 重绘会重建 <select>，
+                                  无此表则选择活不过一个轮询周期。服务端 currentVersion
+                                  追上所选值（=切换/回滚已生效）时自动清除。 */
+  var timer = null;
+  var health = null;
+
+  /* ---------------------------------------------------------- 工具 */
+  function $(id) { return document.getElementById(id); }
+
+  function esc(s) {
+    if (s === null || s === undefined) return "";
+    return String(s)
+      .replace(/&/g, "&amp;").replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function nowStr() {
+    var d = new Date();
+    function p2(n) { return (n < 10 ? "0" : "") + n; }
+    return p2(d.getHours()) + ":" + p2(d.getMinutes()) + ":" + p2(d.getSeconds());
+  }
+
+  /* G6：风险确认桩 —— M2 全部运维操作 risk=safe 直接执行；
+   * confirm/destructive 走原生 confirm()（ES5 安全），命令执行属 M3。 */
+  function confirmRisk(level, desc) {
+    if (level === "safe" || !level) return true;
+    return window.confirm(desc);
+  }
+
+  /* ---------------------------------------------------------- XHR */
+  function xhr(method, path, bodyObj, clientTimeoutMs, cb) {
+    var x = new XMLHttpRequest();
+    x.open(method, API + path, true);
+    if (TOKEN) x.setRequestHeader("X-Hub-Token", TOKEN);
+    if (bodyObj !== null && bodyObj !== undefined)
+      x.setRequestHeader("Content-Type", "application/json");
+    x.timeout = clientTimeoutMs;
+    x.onreadystatechange = function () {
+      if (x.readyState !== 4) return;
+      var j = null;
+      try { j = JSON.parse(x.responseText); } catch (e) { j = null; }
+      cb(x.status, j);
+    };
+    x.ontimeout = function () { cb(-1, null); };
+    x.send(bodyObj === null || bodyObj === undefined ? null : JSON.stringify(bodyObj));
+  }
+
+  /* 全局 401 处理：令牌失效 → 停止轮询，横幅提示重开 */
+  function handle401() {
+    if (tokenBad) return;
+    tokenBad = true;
+    if (timer) { clearInterval(timer); timer = null; }
+    showBanner("token", "令牌无效或 hub 已重启（401）—— 请从 Creo 菜单 Open Web Panel 重新打开本面板。");
+    setOpsDisabled(true);
+  }
+
+  function showBanner(kind, msg) {
+    var b = $("banner");
+    if (!msg) { b.className = ""; b.innerHTML = ""; return; }
+    b.className = "show" + (kind === "warn" ? " warn" : "");
+    b.innerHTML = esc(msg);
+  }
+
+  function setOpsDisabled(off) {
+    var btns = [$("btnRefresh"), $("btnMountAll"), $("btnUnloadAll")];
+    var i;
+    for (i = 0; i < btns.length; i++) if (btns[i]) btns[i].disabled = off;
+  }
+
+  /* 断连/401 时把已渲染卡片上的操作控件一并禁用 */
+  function disableAllCardOps() {
+    var all = document.getElementsByTagName("button");
+    var i;
+    for (i = 0; i < all.length; i++) {
+      var bid = all[i].id || "";
+      if (bid.indexOf("mnt-") === 0 || bid.indexOf("unm-") === 0 ||
+          bid.indexOf("upd-") === 0 || bid.indexOf("rb-") === 0) all[i].disabled = true;
+    }
+    var boxes = document.getElementsByTagName("input");
+    for (i = 0; i < boxes.length; i++) {
+      if ((boxes[i].id || "").indexOf("auto-") === 0) boxes[i].disabled = true;
+    }
+    var sels = document.getElementsByTagName("select");
+    for (i = 0; i < sels.length; i++) {
+      if ((sels[i].id || "").indexOf("ver-") === 0) sels[i].disabled = true;
+    }
+  }
+
+  /* ---------------------------------------------------------- 轮询 */
+  function tick() {
+    if (tokenBad) return;
+    xhr("GET", "/health", null, 5000, function (st, j) {
+      if (st === 401) { handle401(); return; }
+      if (st === 200 && j && j.ok) {
+        if (!connected) { connected = true; showBanner(null); setOpsDisabled(false); }
+        window.__hubAlive = true;   /* 诊断 watchdog：health 已通 */
+        health = j;
+        renderHealth(j);
+      } else {
+        /* 可见化一切失败：静默留在"连接中…"会掩盖根因（9/13 实测教训）。
+         * st=-1 超时 / st=0 连接失败 → 断连横幅；其他状态码 → 原样展示。 */
+        connected = false;
+        if (st === -1 || st === 0) {
+          showBanner("err", "hub 已断开（Creo 关闭或 Aux Apps 已停止）—— 面板只读，操作已禁用。");
+        } else {
+          showBanner("err", "health 探测返回 HTTP " + st +
+             (j && j.error ? "（" + j.error + "）" : "") +
+             " —— 面板只读；持续出现请把 logs\\hub_m1.log 发给开发者。");
+        }
+        setOpsDisabled(true);
+        disableAllCardOps();
+        $("stats").innerHTML = '<span class="r">● ' +
+          (st === -1 || st === 0 ? "hub 已断开" : "HTTP " + esc(st)) + "</span>";
+        return; /* 失败时不再打 plugins/log，避免无谓请求 */
+      }
+      getPlugins();
+      getPending();   /* b4 四件套①：确认对话框数据源 */
+      getLog();
+      getJobs();      /* M4b：async 任务条（只读；面板不发起命令） */
+    });
+  }
+
+  function renderHealth(h) {
+    var feat = (h.features || []).join(",");
+    $("stats").innerHTML =
+      '<span class="dot' + (h.executorReady ? "" : " off") + '"></span>' +
+      '运行 <b class="g" id="stActive">-</b> / 共 <b id="stTotal">-</b>' +
+      ' &nbsp;·&nbsp; 端口 <b>' + esc(h.port) + '</b>' +
+      ' &nbsp;·&nbsp; 运行时长 <b>' + esc(h.uptimeSec) + 's</b>' +
+      ' &nbsp;·&nbsp; 队列 <b' + (h.queueUsed > 0 ? ' class="y"' : "") + '>' +
+        esc(h.queueUsed) + '/16</b>' +
+      ' &nbsp;·&nbsp; ' + esc(h.apiVersion) + ' [' + esc(feat) + ']' +
+      /* b4 四件套④：孤儿态顶栏红灯（executorReady 后端已含 !orphaned，
+       * 这里给出可读区分：孤儿执行中 vs 单纯未就绪） */
+      (h.orphaned
+        ? ' &nbsp;<span class="r" id="orphanLight">● 孤儿命令执行中 —— 等待其完成，期间新命令被阻塞</span>'
+        : (h.executorReady ? "" : ' &nbsp;<span class="y">执行者未就绪</span>'));
+    renderOpmode(h);   /* M3e Q1：模式横幅/状态 */
+  }
+
+  function getPlugins() {
+    xhr("GET", "/plugins", null, 5000, function (st, j) {
+      if (st === 401) { handle401(); return; }
+      if (st === 200 && j && j.ok) renderPlugins(j);
+    });
+  }
+
+  /* ---------------- M4b: async job strip (GET /api/v1/jobs) ----------------
+   * 只读展示：面板不发起 /call（命令面由桥/助手发起）。有活任务时显示
+   * 命令名/状态/进度条/耗时；无任务自动隐藏。ES5 only。 */
+  function getJobs() {
+    xhr("GET", "/jobs", null, 4000, function (st, j) {
+      if (st === 401) { handle401(); return; }
+      if (st === 200 && j && j.ok) renderJobs(j);
+    });
+  }
+
+  function renderJobs(j) {
+    var bar = $("jobsBar");
+    var jobs = (j && j.jobs) || [];
+    var i, t, h, pct, ind, secs;
+    if (!bar) return;
+    if (!jobs.length) { bar.style.display = "none"; bar.innerHTML = ""; return; }
+    h = '<span class="jlabel">任务</span>';
+    for (i = 0; i < jobs.length; i++) {
+      t = jobs[i];
+      pct = (typeof t.pct === "number" && t.pct >= 0) ? t.pct : 0;
+      ind = (typeof t.pct === "number" && t.pct >= 0) ? "" : " ind";
+      secs = Math.round(((t.elapsedMs || 0) / 100)) / 10;
+      h += '<span class="job"><b>' + esc(t.command) + '</b> ' +
+           '<span class="' + (t.state === "working" ? "y" : "") + '">' + esc(t.state) + '</span>' +
+           '<span class="jbar"><span class="jfill' + ind + '" style="width:' + pct + '%"></span></span>' +
+           (t.msg ? '<span class="mono">' + esc(t.msg) + '</span> ' : '') +
+           '<span class="mono">' + esc(secs) + 's</span></span>';
+    }
+    bar.innerHTML = h;
+    bar.style.display = "";
+  }
+
+  /* ---------------------------------------------------------- 徽章 */
+  function stateBadge(st) {
+    switch (st) {
+      case "ACTIVE":     return '<span class="badge b-active">运行中</span>';
+      case "REGISTERED": return '<span class="badge b-reg">未挂载</span>';
+      case "MOUNTING":
+      case "UNMOUNTING": return '<span class="badge b-trans">过渡…</span>';
+      case "ERROR":      return '<span class="badge b-error">错误(可重试)</span>';
+      case "TAINTED":    return '<span class="badge b-tainted" title="卸载失败：DLL 可能仍驻留 Creo 会话。重启 Creo 后恢复干净，期间请勿重复挂载">污染(需重启Creo)</span>';
+      case "INVALID":    return '<span class="badge b-invalid">无效</span>';
+      case "UNSUPPORTED":return '<span class="badge b-unsup">不支持</span>';
+      default:           return '<span class="badge b-reg">' + esc(st) + "</span>";
+    }
+  }
+
+  function riskBadge(r) {
+    if (r === "safe") return '<span class="risk r-safe">safe</span>';
+    if (r === "confirm") return '<span class="risk r-conf">confirm</span>';
+    if (r === "destructive") return '<span class="risk r-destr">destructive</span>';
+    return '<span class="risk">' + esc(r) + "</span>";
+  }
+
+  /* ---------------------------------------------------------- 渲染 */
+  /* b4 修复（真机 ISSUE-b4-2）：稳态跳过重绘。此前每 2s 无条件重建 #cards，
+   * 用户展开的版本下拉弹层会被轮询当场销毁（选项列表"极短时间内消失"），
+   * 且整版闪烁/滚动跳动。现在只有卡片依赖的数据真实变化（含 3s 结果色
+   * 窗口过期、飞行中操作、展开态、verPick、manifest 缓存到位）才重建；
+   * 稳态下 DOM 原样保留——弹层存活、无闪烁。 */
+  var lastCardsKey = "";
+  function cardsKey(j, nowMs) {
+    var list = j.plugins || [];
+    var k = [];
+    var i, id;
+    for (i = 0; i < list.length; i++) {
+      var p = list[i];
+      k.push([p.id, p.name, p.version, p.state, p.fingerprint,
+              p.fingerprintChanged ? 1 : 0, p.autoMount ? 1 : 0, p.wantMount,
+              (p.requires || []).join(","), (p.provides || []).join(","),
+              p.currentVersion || "", (p.availableVersions || []).join(","),
+              p.invalidReason || "", p.lastErr || "", p.waitingFor || "",
+              (p.commands || []).length].join("~"));
+    }
+    var extra = "@" + (connected ? 1 : 0) + (tokenBad ? 1 : 0);
+    for (id in lastOkAt) if (nowMs - lastOkAt[id] < 3200) extra += "|o" + id;
+    for (id in lastErrAt) if (nowMs - lastErrAt[id] < 3200) extra += "|e" + id;
+    for (id in lastError) if (lastError[id]) extra += "|L" + id + lastError[id];
+    for (id in lastOk) if (lastOk[id]) extra += "|K" + id + lastOk[id];
+    for (id in inflight) if (inflight[id]) extra += "|i" + id;
+    for (id in expanded) if (expanded[id]) extra += "|x" + id;
+    for (id in verPick) if (verPick[id]) extra += "|v" + id + verPick[id];
+    extra += "|m" + (manifestCache ? (manifestCache._failed ? "F" + manifestCache._failed : "Y") : "N");
+    return k.join("#") + extra;
+  }
+
+  function renderPlugins(j) {
+    var list = j.plugins || [];
+    var html = [];
+    var nActive = 0;
+    var i;
+    lastList = list;   /* 按钮按索引回查永远拿最新数据，即使本轮跳过重建 */
+    for (i = 0; i < list.length; i++) {
+      if (list[i].state === "ACTIVE") nActive++;
+    }
+    var sa = $("stActive"), st = $("stTotal");
+    if (sa) sa.innerHTML = String(nActive);
+    if (st) st.innerHTML = String(j.count || list.length);
+    var key = cardsKey(j, new Date().getTime());
+    if (key === lastCardsKey) return;   /* 稳态：DOM 原样保留（ISSUE-b4-2） */
+    lastCardsKey = key;
+    for (i = 0; i < list.length; i++) {
+      html.push(cardHtml(list[i], i));
+    }
+    $("cards").innerHTML = html.join("") || '<div class="card">（无插件包 —— 将包放入 <span class="mono">plugins\\</span> 后点 Refresh Registry）</div>';
+  }
+
+  function cardHtml(p, idx) {
+    var id = esc(p.id);
+    var busy = !!inflight[p.id];
+    var dis = (!connected || tokenBad || busy) ? " disabled" : "";
+    /* b4 R4（ISSUE-C3）：按钮使能与状态机联动 —— Mount 仅 REGISTERED/ERROR
+     * 可用，Unmount 仅 ACTIVE 可用；过渡态双禁（渲染即禁用，不靠点击失败）。 */
+    var canMount = (p.state === "REGISTERED" || p.state === "ERROR");
+    var canUnmount = (p.state === "ACTIVE");
+    var mdis = (dis || !canMount) ? " disabled" : "";
+    var udis = (dis || !canUnmount) ? " disabled" : "";
+    var nowMs = new Date().getTime();
+    var h = [];
+    var meta = [];
+    var cls = "card";
+    if (p.state === "INVALID") cls += " invalid";
+    if (p.state === "TAINTED") cls += " tainted";
+    /* b4 R4：行色由最近操作结果驱动（3s 新鲜窗口，随 2s 轮询自然消退） */
+    if (lastErrAt[p.id] && nowMs - lastErrAt[p.id] < 3000) cls += " flash-err";
+    else if (lastOkAt[p.id] && nowMs - lastOkAt[p.id] < 3000) cls += " flash-ok";
+
+    h.push('<div class="' + cls + '" id="card-' + id + '">');
+
+    /* 头行：名称 + id + 版本 + 徽章 + 开关 + 按钮
+     * 事件一律按【索引】回查 lastList，插件元数据永不进入内联 JS。 */
+    h.push('<div class="cardhead">');
+    h.push('<span class="pname">' + esc(p.name && p.name.length ? p.name : p.id) + "</span>");
+    h.push('<span class="pid mono">' + id + "</span>");
+    if (p.version) h.push('<span class="pver mono">v' + esc(p.version) + "</span>");
+    h.push(stateBadge(p.state));
+    if (p.fingerprintChanged)
+      h.push('<span class="badge b-fp" title="清单指纹已变化（R2）：重新 Mount 后生效。指纹 ' +
+             esc(p.fingerprint) + '">清单已变更</span>');
+    if (p.state !== "INVALID" && p.state !== "UNSUPPORTED") {
+      h.push('<span class="autoline"><label><input type="checkbox" id="auto-' + id + '"' +
+             (p.autoMount ? ' checked="checked"' : "") + dis +
+             ' onchange="Hub.autoIdx(' + idx + ',this.checked)">autoMount</label></span>');
+    }
+    h.push('<span class="cardbtns">');
+    if (p.commands && p.commands.length)
+      h.push('<button id="cmd-' + id + '"' + (tokenBad ? " disabled" : "") +
+             ' onclick="Hub.cmdIdx(' + idx + ')">' +
+             (expanded[p.id] ? "▼" : "▶") + " 命令 " + p.commands.length + "</button>");
+    if (p.state !== "INVALID" && p.state !== "UNSUPPORTED" && p.state !== "TAINTED") {
+      h.push('<button class="primary" id="mnt-' + id + '"' + mdis +
+             (canMount ? "" : ' title="仅 REGISTERED/ERROR 状态可挂载（R4 状态机联动）"') +
+             ' onclick="Hub.opIdx(\'mount\',' + idx + ')">Mount</button>');
+      h.push('<button class="danger" id="unm-' + id + '"' + udis +
+             (canUnmount ? "" : ' title="仅 ACTIVE 状态可卸载（R4 状态机联动）"') +
+             ' onclick="Hub.opIdx(\'unmount\',' + idx + ')">Unmount</button>');
+    }
+    h.push("</span></div>");
+
+    /* 元信息行 */
+    meta.push("适配器 <span class=\"mono\">" + esc(p.adapter) + "</span>");
+    meta.push("清单 v" + esc(p.manifestVersion));
+    meta.push('指纹 <span class="mono" title="plugin.json 全文 + 入口路径的 FNV-1a64（R2）">' +
+              esc(p.fingerprint) + "</span>");
+    if (p.wantMount === 1) meta.push("目标 <span>挂载</span>");
+    else if (p.wantMount === 0) meta.push("目标 <span>卸载</span>");
+    else meta.push('目标 <span title="尚无显式意图，随 autoMount/上次会话语义">未设</span>');
+    var k;
+    for (k = 0; k < (p.requires || []).length; k++)
+      meta.push('<span class="chip" title="requires">需 ' + esc(p.requires[k]) + "</span>");
+    for (k = 0; k < (p.provides || []).length; k++)
+      meta.push('<span class="chip" title="provides">供 ' + esc(p.provides[k]) + "</span>");
+    h.push('<div class="meta">' + meta.join(" &nbsp;·&nbsp; ") + "</div>");
+
+    /* b4 四件套②：版本列 —— 指针包显示 currentVersion + 可用版本下拉 +
+     * 切换/回滚钮（POST /update 与 /rollback，P1b 手动回滚） */
+    if (p.currentVersion) {
+      var av = p.availableVersions || [];
+      var vopts = [];
+      var vk;
+      /* 用户进行中选择优先于服务端当前值渲染（ISSUE-b4-1 修复） */
+      var selVer = p.currentVersion;
+      if (verPick[p.id]) {
+        if (verPick[p.id] === p.currentVersion) delete verPick[p.id]; /* 服务端已追上=操作生效 */
+        else {
+          for (vk = 0; vk < av.length; vk++)
+            if (av[vk] === verPick[p.id]) { selVer = verPick[p.id]; break; }
+          if (selVer !== verPick[p.id]) delete verPick[p.id]; /* 选项已消失 */
+        }
+      }
+      for (vk = 0; vk < av.length; vk++)
+        vopts.push('<option value="' + esc(av[vk]) + '"' +
+                   (av[vk] === selVer ? ' selected="selected"' : "") + ">" +
+                   esc(av[vk]) + "</option>");
+      h.push('<div class="verline">当前版本 <b class="mono">' + esc(p.currentVersion) + "</b>" +
+             (vopts.length
+              ? ' <select id="ver-' + id + '"' + dis +
+                ' onchange="Hub.verPickIdx(' + idx + ',this.value)">' + vopts.join("") + "</select>" +
+                '<button id="upd-' + id + '"' + dis +
+                ' onclick="Hub.verIdx(' + idx + ',\'update\')">切换</button>' +
+                '<button id="rb-' + id + '" class="danger"' + dis +
+                ' onclick="Hub.verIdx(' + idx + ',\'rollback\')" title="P1b 手动回滚：指针切回所选版本（原 ACTIVE 则重挂）">回滚</button>'
+              : "") + "</div>");
+    }
+
+    /* INVALID 原因 / ERROR lastErr / 最近操作反馈 */
+    if (p.state === "INVALID" && p.invalidReason)
+      h.push('<div class="errline">无效原因：' + esc(p.invalidReason) + "</div>");
+    if ((p.state === "ERROR" || p.state === "TAINTED") && p.lastErr)
+      h.push('<div class="errline">最近错误：' + esc(p.lastErr) + "</div>");
+    if (lastError[p.id])
+      h.push('<div class="errline">操作失败：' + esc(lastError[p.id]) + "</div>");
+    else if (lastOk[p.id])
+      h.push('<div class="okline">' + esc(lastOk[p.id]) + "</div>");
+
+    /* G6 命令只读视图 */
+    if (expanded[p.id]) h.push(cmdBlockHtml(p.id));
+
+    h.push("</div>");
+    return h.join("");
+  }
+
+  function cmdBlockHtml(pid) {
+    var h = ['<div class="cmdblock">'];
+    if (!manifestCache) {
+      if (!manifestLoading) loadManifest();
+      h.push('<div class="meta">命令契约加载中…（首次展开拉取 /manifest）</div>');
+    } else if (manifestCache._failed) {
+      h.push('<div class="meta">清单暂不可用（HTTP ' + esc(manifestCache._failed) +
+             '）—— 收起后重新展开可重试。</div>');
+    } else {
+      var pl = findManifestPlugin(pid);
+      if (!pl || !pl.commands || !pl.commands.length) {
+        h.push('<div class="meta">该插件未声明命令（commands 为可选字段）。</div>');
+      } else {
+        h.push('<table class="cmds"><tr><th>命令</th><th>风险</th><th>说明</th>' +
+               "<th>LLM 描述</th><th>超时/可逆/幂等</th><th>入参 Schema</th><th></th></tr>");
+        for (var i = 0; i < pl.commands.length; i++) {
+          var c = pl.commands[i];
+          h.push("<tr>");
+          h.push('<td class="mono">' + esc(c.id) + "<br><b>" + esc(c.title) + "</b></td>");
+          h.push("<td>" + riskBadge(c.risk) + "</td>");
+          h.push("<td>" + esc(c.desc) + "</td>");
+          h.push('<td class="llmdesc">' + esc(c.descForLLM) + "</td>");
+          h.push("<td class=\"mono\">" +
+                 (c.timeoutSec > 0 ? esc(c.timeoutSec) + "s" : "-") + " / " +
+                 (c.reversible === 1 ? "可逆" : c.reversible === 0 ? "不可逆" : "-") + " / " +
+                 (c.idempotent === 1 ? "幂等" : c.idempotent === 0 ? "非幂等" : "-") + "</td>");
+          h.push('<td><pre class="schema">' + esc(prettySchema(c.inputSchema)) + "</pre></td>");
+          h.push('<td><button disabled title="M3 预留：命令执行通道（M2 仅展示契约）">调用(M3)</button></td>');
+          h.push("</tr>");
+        }
+        h.push("</table>");
+      }
+    }
+    h.push("</div>");
+    return h.join("");
+  }
+
+  function findManifestPlugin(pid) {
+    var arr = (manifestCache && manifestCache.plugins) || [];
+    for (var i = 0; i < arr.length; i++) if (arr[i].id === pid) return arr[i];
+    return null;
+  }
+
+  function prettySchema(s) {
+    if (!s) return "(未声明)";
+    try { return JSON.stringify(s, null, 2); } catch (e) { return "(解析失败)"; }
+  }
+
+  function loadManifest() {
+    manifestLoading = true;
+    xhr("GET", "/manifest", null, 8000, function (st, j) {
+      manifestLoading = false;
+      if (st === 401) { handle401(); return; }
+      if (st === 200 && j && j.ok) {
+        manifestCache = j;
+        getPlugins(); /* 重渲染以填充已展开的命令块 */
+      } else {
+        /* 失败哨兵：防每 2s 轮询重拉风暴；用户收起再展开=手动重试 */
+        manifestCache = { _failed: st };
+        getPlugins();
+      }
+    });
+  }
+
+  /* ---------------------------------------------------------- 日志 */
+  function getLog() {
+    xhr("GET", "/log?offset=" + logOffset, null, 5000, function (st, j) {
+      if (st === 401) { handle401(); return; }
+      if (st !== 200 || !j || !j.ok) return;
+      logOffset = j.offset;
+      $("logmeta").innerHTML = "offset=" + esc(j.offset) + " size=" + esc(j.size);
+      if (!logPaused && j.lines && j.lines.length) appendLog(j.lines);
+      else if (j.lines && j.lines.length) pendingLines = pendingLines.concat(j.lines);
+    });
+  }
+
+  var pendingLines = [];   /* 暂停期间缓存，恢复时一次性补 */
+
+  function appendLog(lines) {
+    /* DOM-based append + node-wise trim (R13 fix, field P5 bug):
+     * old code did `box.innerHTML += ...` with all spans on ONE text line
+     * and trimmed by cutting at the first "\n" — with >LOG_CAP lines the
+     * first trim wiped the ENTIRE box (real 1000-line log showed nothing;
+     * offline seed had only 5 lines so the trim path was never covered).
+     * Node-based version is also O(n) instead of O(n^2) innerHTML churn. */
+    var box = $("logbox");
+    var frag = document.createDocumentFragment();
+    var i;
+    for (i = 0; i < lines.length; i++) {
+      var cls = "";
+      var ln = lines[i];
+      if (ln.indexOf("[AUDIT]") >= 0) cls = "l-audit";
+      else if (ln.indexOf("fail") >= 0 || ln.indexOf("ERROR") >= 0 || ln.indexOf("FAIL") >= 0)
+        cls = "l-err";
+      else if (ln.indexOf("mounted") >= 0 || ln.indexOf("OK") >= 0 || ln.indexOf("done") >= 0)
+        cls = "l-ok";
+      var sp = document.createElement("span");
+      if (cls) sp.className = cls;
+      sp.appendChild(document.createTextNode(ln));  /* textNode = 无注入面 */
+      frag.appendChild(sp);
+      frag.appendChild(document.createTextNode("\n"));
+      logLines++;
+    }
+    box.appendChild(frag);
+    while (logLines > LOG_CAP && box.firstChild) {   /* 裁顶部：一行=span+\n 两节点 */
+      box.removeChild(box.firstChild);
+      if (box.firstChild && box.firstChild.nodeType === 3) box.removeChild(box.firstChild);
+      logLines--;
+    }
+    box.scrollTop = box.scrollHeight;     /* 自动滚底 */
+  }
+
+  function toggleLogPause() {
+    logPaused = !logPaused;
+    $("btnLogPause").innerHTML = logPaused ? "继续" : "暂停";
+    if (!logPaused && pendingLines.length) {
+      appendLog(pendingLines);
+      pendingLines = [];
+    }
+  }
+
+  /* ---------------------------------------------------------- 操作 */
+  /* op: refresh/mount-all/unload-all（全局） 或 mount/unmount/automount（带 id）
+   * M2 全部运维操作 risk=safe（guarded、可逆），直接执行；confirmRisk 桩
+   * 留给 M3 命令执行通道（confirm/destructive 将走确认对话框）。
+   * 503-busy 自动重试上限 3 次（借鉴 DSH 审批疲劳教训：绝不无限骚扰）。 */
+  function op(name, pid, extra, isRetry) {
+    var key = pid || name;
+    if (!connected || tokenBad) return;
+    if (inflight[key]) return;
+    if (!isRetry) retries[key] = 0;
+    inflight[key] = true;
+    delete lastError[key];
+    delete lastOk[key];
+    renderBusy(key, true);
+    var body = extra || {};
+    if (pid) body.id = pid;
+    /* 客户端超时 > 服务端默认 10s；503 busy 由服务端即时返回 */
+    xhr("POST", "/" + name, body, 16000, function (st, j) {
+      inflight[key] = false;
+      renderBusy(key, false);
+      if (st === 401) { handle401(); return; }
+      if (st === 503 && j && j.error === "busy") {
+        retries[key] = (retries[key] || 0) + 1;
+        if (retries[key] <= 3) {
+          lastError[key] = "主线程忙（队列已满），第 " + retries[key] + "/3 次自动重试…";
+          lastErrAt[key] = new Date().getTime();
+          getPlugins();
+          window.setTimeout(function () { op(name, pid, extra, true); }, 1200);
+          return;
+        }
+        lastError[key] = "主线程持续繁忙，已停止自动重试 —— 稍后再点一次即可";
+        lastErrAt[key] = new Date().getTime();
+        tick();
+        return;
+      }
+      if (st === 200 && j) {
+        if (j.ok) {
+          retries[key] = 0;
+          lastOk[key] = nowStr() + " " + name + " 成功" +
+                        (j.state ? " → " + j.state : "") +
+                        (j.seq !== undefined ? " (seq " + j.seq + ")" : "");
+          lastOkAt[key] = new Date().getTime();   /* b4 R4：行色由结果驱动 */
+          if (name === "refresh") manifestCache = null;  /* 清单可能变了 */
+        } else {
+          lastError[key] = (j.error || "操作失败") + (j.code ? " [" + j.code + "]" : "") +
+                           (j.state ? " 状态=" + j.state : "");
+          lastErrAt[key] = new Date().getTime();
+        }
+      } else if (st === -1 || st === 0) {
+        lastError[key] = "请求超时/连接失败 —— 检查 hub 是否仍在运行";
+        lastErrAt[key] = new Date().getTime();
+      } else {
+        lastError[key] = "HTTP " + st;
+        lastErrAt[key] = new Date().getTime();
+      }
+      tick(); /* 立即刷新全量状态 */
+    });
+  }
+
+  /* 索引入口：pid 从 lastList 现取，内联事件只携带数字 */
+  function opIdx(name, idx) {
+    var p = lastList[idx];
+    if (!p) return;
+    if (name === "unmount") { unmountIdx(p); return; }   /* b4 四件套③ */
+    op(name, p.id);
+  }
+
+  /* b4 四件套③：调和计划展示 —— 卸载先取 dryRun 排空计划（b3 depgraph：
+   * 传递闭包、依赖者优先），级联 >1 个时列"将级联卸载 N 个"再确认。
+   * dryRun 不执行任何东西，确认后才发真卸。 */
+  function unmountIdx(p) {
+    if (!connected || tokenBad || inflight[p.id]) return;
+    xhr("POST", "/unmount", { id: p.id, dryRun: true }, 16000, function (st, j) {
+      if (st === 401) { handle401(); return; }
+      if (st === 200 && j && j.ok && j.drainedList && j.drainedList.length > 1) {
+        if (!window.confirm("将级联卸载 " + j.drainedList.length + " 个插件：\n\n  " +
+            j.drainedList.join("\n  ") +
+            "\n\n（依赖闭包，依赖者优先卸载；" + p.id + " 在列尾）\n\n确认继续？"))
+          return;
+      } else if (!(st === 200 && j && j.ok)) {
+        lastError[p.id] = "卸载计划获取失败（HTTP " + st + "）";
+        lastErrAt[p.id] = new Date().getTime();
+        getPlugins();
+        return;
+      }
+      op("unmount", p.id);
+    });
+  }
+
+  /* b4 四件套②：版本切换/回滚（下拉现值 + update/rollback 动词） */
+  function verIdx(idx, verb) {
+    var p = lastList[idx];
+    var sel, v;
+    if (!p) return;
+    sel = $("ver-" + p.id);
+    if (!sel) return;
+    v = sel.value;
+    if (v === p.currentVersion) {
+      delete verPick[p.id];
+      lastError[p.id] = "已是当前版本 " + v + "（无需" + (verb === "rollback" ? "回滚" : "切换") + "）";
+      lastErrAt[p.id] = new Date().getTime();
+      getPlugins();
+      return;
+    }
+    op(verb, p.id, { version: v });
+  }
+
+  /* b4 修复（ISSUE-b4-1）：记录用户在下拉里的进行中选择，使其跨 2s 重绘存活。
+   * 只接收索引 + 版本串（选项 value，非插件元数据），符合注入纪律。 */
+  function verPickIdx(idx, val) {
+    var p = lastList[idx];
+    if (!p) return;
+    if (val === p.currentVersion) delete verPick[p.id];
+    else verPick[p.id] = val;
+  }
+
+  function autoIdx(idx, checked) {
+    var p = lastList[idx];
+    if (p) op("automount", p.id, { value: checked ? true : false });
+  }
+  function cmdIdx(idx) {
+    var p = lastList[idx];
+    if (!p) return;
+    expanded[p.id] = !expanded[p.id];
+    if (expanded[p.id] && !manifestCache && !manifestLoading) loadManifest();
+    getPlugins();
+  }
+
+  function renderBusy(key, on) {
+    var ids = ["mnt-", "unm-", "auto-", "upd-", "rb-", "ver-"];
+    var i, el;
+    if (key === "refresh" || key === "mount-all" || key === "unload-all") {
+      setOpsDisabled(on || !connected);
+      return;
+    }
+    for (i = 0; i < ids.length; i++) {
+      el = $(ids[i] + key);
+      if (el) el.disabled = on || !connected;
+    }
+  }
+
+  /* ---------------------------------------------------------- b4 四件套①
+   * 确认对话框：轮询 GET /pending 拉取活工单（428 needConfirm 的 hub 侧
+   * 镜像，confirmVia panel-required 的执行面）。渲染纪律与卡片一致：
+   * 工单数据只经 esc() 进 DOM，按钮内联 JS 只带索引。 */
+  function getPending() {
+    xhr("GET", "/pending", null, 5000, function (st, j) {
+      if (st === 401) { handle401(); return; }
+      if (st === 200 && j && j.ok) renderConfirm(j.pending || []);
+    });
+  }
+
+  var cfmMinUser = null;   /* 手动最小化覆盖；null=自动（无 ISSUED 票时收薄） */
+  function renderConfirm(list) {
+    var ov = $("cfmOverlay"), box = $("cfmBox"), out = [];
+    var hasDestr = false, i, issued = 0, approved = 0, minGrace = 0;
+    pendCache = list;
+    if (!list.length) { ov.className = ""; cfmMinUser = null; return; }
+    for (i = 0; i < list.length; i++) {
+      var t = list[i];
+      var sec = Math.max(0, Math.ceil((t.remainingMs || 0) / 1000));
+      if (t.risk === "destructive") hasDestr = true;
+      /* M3e S1b: approved tickets show the 10-min grace window (min+sec),
+       * not the 60s attention countdown; urgent style only pre-approval. */
+      var appr = (t.state === "approved");
+      if (appr) { approved++; if (!minGrace || sec < minGrace) minGrace = sec; }
+      else issued++;
+      out.push('<div class="cfmItem' + (appr ? " cfmSlimRow" : "") + '">');
+      out.push('<span class="cfmCd' + (!appr && sec <= 10 ? " urgent" : "") + '" id="cfmCd-' + i + '">' +
+               (appr ? graceLbl(sec) + " 宽限" : sec + "s 倒计时") + "</span>");
+      out.push('<span class="cfmHead">' + riskBadge(t.risk) + " " +
+               esc(t.title && t.title.length ? t.title : t.command) + "</span>");
+      if (t.state === "approved") {
+        /* M3e Q2 P-2: approved = thin status row (no buttons, no meta wall) */
+        out.push('<div class="cfmApproved">✔ 已批准 —— 等待调用方携票重试执行</div>');
+      } else {
+        out.push('<div class="cfmMeta">插件 <span class="mono">' + esc(t.plugin) +
+                 "</span> · 命令 <span class=\"mono\">" + esc(t.command) +
+                 '</span><br>args 摘要 <span class="mono" title="argsDigest=FNV-1a64(规范化 args)，批准与执行必须同一摘要">' +
+                 esc(String(t.argsDigest || "").substring(0, 8)) + "…</span>" +
+                 ' · 工单 <span class="mono">' + esc(String(t.transactionId || "").substring(0, 8)) +
+                 "…</span> · nonce <span class=\"mono\">" + esc(t.nonceId) + "…</span></div>");
+        out.push('<div style="margin-top:6px">' +
+                 '<button class="primary" id="cfmOk-' + i + '" onclick="Hub.confirmTxn(' + i + ',true)">批准</button>' +
+                 '<button class="danger" id="cfmNo-' + i + '" onclick="Hub.confirmTxn(' + i + ',false)">拒绝</button>' +
+                 "</div>");
+      }
+      out.push("</div>");
+    }
+    $("cfmList").innerHTML = out.join("");
+    /* M3e Q2 P-1: non-modal drawer; auto-minimize when nothing awaits action */
+    box.className = (hasDestr ? "destr" : "") +
+      ((cfmMinUser === null ? issued === 0 : cfmMinUser) ? " min" : "");
+    $("cfmMinBtn").innerHTML = /min/.test(box.className) ? "展开" : "最小化";
+    $("cfmSlim").innerHTML = "待批 " + issued + " · 已批准待重试 " + approved +
+      (approved ? "（最短宽限 " + graceLbl(minGrace) + "）" : "");
+    $("cfmTitle").innerHTML = (hasDestr
+      ? '待确认命令（<span style="color:#f85149">含 destructive 级</span>）'
+      : "待确认命令") +
+      ' <span style="color:#8b949e;font-size:12px">待批 ' + issued + " / 已批 " + approved + "</span>";
+    ov.className = "show";
+    pendShownAt = new Date().getTime();
+  }
+
+  function toggleCfmMin() {
+    var box = $("cfmBox");
+    var cur = /min/.test(box.className);
+    cfmMinUser = !cur;
+    box.className = box.className.replace(" min", "") + (cfmMinUser ? " min" : "");
+    $("cfmMinBtn").innerHTML = cfmMinUser ? "展开" : "最小化";
+  }
+
+  /* ------------------------------------------------ M3e Q1 操作者模式菜单 */
+  function omModeChanged() {
+    var m = parseInt($("omMode").value, 10);
+    $("omAckLbl").style.display = (m === 2) ? "" : "none";
+  }
+  function applyOpmode() {
+    var m = parseInt($("omMode").value, 10);
+    var body = { mode: m };
+    if (m === 2) {
+      body.minutes = parseInt($("omMin").value, 10);
+      body.ack = !!$("omAck").checked;
+    }
+    xhr("POST", "/opmode", body, 8000, function (st, j) {
+      if (st === 401) { handle401(); return; }
+      tick();   /* health 回带 opmode 状态刷新横幅 */
+    });
+  }
+  function renderOpmode(h) {
+    var m = h.opmode || 0;
+    var rem = h.opmodeRemainMs || 0;
+    $("opmodebar").className = m === 2 ? "armed2" : (m === 1 ? "armed1" : "");
+    $("omStatus").innerHTML = m === 0 ? "当前=M0 标准"
+      : m === 1 ? "当前=M1 会话信任（confirm 自动过票，destructive 恒面板）"
+      : "当前=M2 无人窗余 " + graceLbl(Math.max(0, Math.ceil(rem / 1000)) +
+        "（confirm+destructive 自动过票；到期回 M0）");
+  }
+
+  function confirmTxn(idx, approve) {
+    var t = pendCache[idx];
+    if (!t || t.state === "approved") return;
+    var okB = $("cfmOk-" + idx), noB = $("cfmNo-" + idx);
+    if (okB) okB.disabled = true;
+    if (noB) noB.disabled = true;
+    xhr("POST", "/confirm", { transactionId: t.transactionId, approve: !!approve },
+        8000, function (st, j) {
+      if (st === 401) { handle401(); return; }
+      if (st === 200 && j && j.ok) {
+        getPending();   /* 立即重拉：批准态刷新/拒绝后消失 */
+      } else {
+        /* 409=过期/已消费，404=已被驱逐：都属于"工单已死"，重拉即清 */
+        getPending();
+        tick();
+      }
+    });
+  }
+
+  /* 秒级倒计时细分：轮询 2s 一跳，本地 1s 递减显示（服务端 remainingMs
+   * 为权威，每次 renderConfirm 重新对表，本地只负责两跳之间的秒数）。
+   * M3e S1b：approved 票显示宽限窗（>=2min 用 分+秒），ISSUED 仍秒级倒计时。 */
+  function graceLbl(sec) {
+    return sec >= 120 ? Math.floor(sec / 60) + "分" + (sec % 60) + "s" : sec + "s";
+  }
+  var pendShownAt = 0;
+  function countdownTick() {
+    var ov = $("cfmOverlay");
+    if (!ov || ov.className !== "show") return;
+    var el = new Date().getTime() - pendShownAt;
+    for (var i = 0; i < pendCache.length; i++) {
+      var node = $("cfmCd-" + i);
+      if (!node) continue;
+      var appr = (pendCache[i].state === "approved");
+      var sec = Math.max(0, Math.ceil(((pendCache[i].remainingMs || 0) - el) / 1000));
+      node.innerHTML = appr ? graceLbl(sec) + " 宽限" : sec + "s 倒计时";
+      node.className = "cfmCd" + (!appr && sec <= 10 ? " urgent" : "");
+    }
+  }
+
+  /* ---------------------------------------------------------- 视图 */
+  function showView(v) {
+    $("viewPlugins").className = "view" + (v === "plugins" ? " active" : "");
+    $("viewChat").className = "view" + (v === "chat" ? " active" : "");
+    $("tabPlugins").className = "tab" + (v === "plugins" ? " active" : "");
+    $("tabChat").className = "tab" + (v === "chat" ? " active" : "");
+    if (v === "chat") chatProbeStatus();   /* M4d: 显示 agent/模型状态 */
+  }
+
+  /* ---------------- M4d：对话 tab（hub-agent，ES5 轮询/单次 POST） ------- */
+  var chatBase = null;
+  var chatHistory = [];
+
+  function chatProbeStatus() {
+    agentProbe(function (base, info) {
+      var st = $("chatStatus");
+      if (!st) return;
+      if (!base) { st.textContent = "hub-agent 未运行"; return; }
+      chatBase = base;
+      st.textContent = info && info.model
+        ? ("agent " + base + " · " + (info.model.model || "model?"))
+        : ("agent " + base + " · 模型未配置");
+    });
+  }
+
+  /* 8776..8785 探测（agent 只绑环回；CORS 白名单=面板 origin） */
+  function agentProbe(done) {
+    var port = 8776;
+    function tryNext() {
+      if (port > 8785) { done(null, null); return; }
+      var x = new XMLHttpRequest();
+      x.open("GET", location.protocol + "//" + location.hostname + ":" + port + "/api/agent/health", true);
+      x.timeout = 1200;
+      x.onreadystatechange = function () {
+        if (x.readyState !== 4) return;
+        if (x.status === 200) {
+          var j = null;
+          try { j = JSON.parse(x.responseText); } catch (e) { j = null; }
+          done(location.protocol + "//" + location.hostname + ":" + port, j);
+        } else { port++; tryNext(); }
+      };
+      x.ontimeout = function () { port++; tryNext(); };
+      x.onerror = function () { port++; tryNext(); };
+      try { x.send(); } catch (e) { done(null, null); }
+    }
+    tryNext();
+  }
+
+  function chatAppend(cls, text) {
+    var log = $("chatLog");
+    if (!log) return;
+    var d = document.createElement("div");
+    d.className = "msg " + cls;
+    d.textContent = text;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  /* ---------------- M4d+：面板内模型设置（写 agent.config.json） ---------- */
+  function chatCfgToggle() {
+    var f = $("chatCfgForm");
+    if (!f) return;
+    f.style.display = (f.style.display === "flex") ? "none" : "flex";
+    if (f.style.display === "flex") chatCfgLoad();
+  }
+  function chatCfgLoad() {
+    agentProbe(function (base) {
+      if (!base) { $("chatCfgStatus").textContent = "hub-agent 未运行（先双击 agent\\start_agent.cmd）"; return; }
+      var x = new XMLHttpRequest();
+      x.open("GET", base + "/api/agent/config", true);
+      x.timeout = 5000;
+      if (TOKEN) x.setRequestHeader("X-Hub-Token", TOKEN);
+      x.onreadystatechange = function () {
+        if (x.readyState !== 4) return;
+        if (x.status !== 200) { $("chatCfgStatus").textContent = "读取失败 HTTP " + x.status; return; }
+        var j = null;
+        try { j = JSON.parse(x.responseText); } catch (e) { j = null; }
+        if (j && j.config) {
+          $("cfgBase").value = j.config.baseURL || "";
+          $("cfgModel").value = j.config.model || "";
+          $("cfgTool").value = j.config.toolMode || "native";
+          $("cfgRounds").value = j.config.maxRounds || 6;
+          $("chatCfgStatus").textContent = "已连接 agent（" + (j.config.hasKey ? "已存 key" : "无 key") + "）";
+        }
+      };
+      x.send();
+    });
+  }
+  function chatCfgSave() {
+    var msg = $("cfgMsg");
+    msg.textContent = "保存并测试中…";
+    var body = {
+      baseURL: $("cfgBase").value.replace(/^\s+|\s+$/g, ""),
+      model: $("cfgModel").value.replace(/^\s+|\s+$/g, ""),
+      toolMode: $("cfgTool").value,
+      maxRounds: parseInt($("cfgRounds").value, 10) || 6,
+      test: true
+    };
+    if ($("cfgKey").value) body.apiKey = $("cfgKey").value;
+    agentProbe(function (base) {
+      if (!base) { msg.textContent = "hub-agent 未运行"; return; }
+      var x = new XMLHttpRequest();
+      x.open("POST", base + "/api/agent/config", true);
+      x.timeout = 65000;
+      x.setRequestHeader("Content-Type", "application/json");
+      if (TOKEN) x.setRequestHeader("X-Hub-Token", TOKEN);
+      x.onreadystatechange = function () {
+        if (x.readyState !== 4) return;
+        var j = null;
+        try { j = JSON.parse(x.responseText); } catch (e) { j = null; }
+        if (x.status === 200 && j && j.ok) {
+          $("chatCfgStatus").textContent = "已保存：" + (j.config.model || "");
+          if (j.test && j.test.ok) msg.textContent = "连接成功，可以开始对话";
+          else msg.textContent = "已保存，但模型测试失败：" + ((j.test && (j.test.hint || j.test.err_code)) || "未知原因");
+        } else {
+          msg.textContent = "保存失败：" + ((j && (j.hint || j.err_code || j.error)) || ("HTTP " + x.status));
+        }
+      };
+      x.onerror = function () { msg.textContent = "无法连接 hub-agent"; };
+      x.ontimeout = function () { msg.textContent = "模型测试超时"; };
+      x.send(JSON.stringify(body));
+    });
+  }
+
+  function chatSend() {
+    var ta = $("chatText");
+    if (!ta) return;
+    var text = (ta.value || "").replace(/^\s+|\s+$/g, "");
+    if (!text) return;
+    ta.value = "";
+    chatAppend("u", text);
+    chatHistory.push({ role: "user", content: text });
+    $("chatStatus").textContent = "思考中…";
+    $("chatSend").disabled = true;
+    $("chatNeed").style.display = "none";
+
+    agentProbe(function (base, info) {
+      if (!base) {
+        chatAppend("err", "未发现 hub-agent（127.0.0.1:8776~8785 无响应）。请先运行 node agent\\hub-agent.mjs。");
+        $("chatStatus").textContent = "hub-agent 未运行";
+        $("chatSend").disabled = false;
+        return;
+      }
+      chatBase = base;
+      if (info && info.model) $("chatStatus").textContent = "思考中…";
+      var x = new XMLHttpRequest();
+      x.open("POST", base + "/api/chat", true);
+      x.setRequestHeader("Content-Type", "application/json");
+      if (TOKEN) x.setRequestHeader("X-Hub-Token", TOKEN);
+      x.timeout = 130000;
+      x.onreadystatechange = function () {
+        if (x.readyState !== 4) return;
+        $("chatSend").disabled = false;
+        var j = null;
+        try { j = JSON.parse(x.responseText); } catch (e2) { j = null; }
+        if (x.status === 200 && j && j.ok) {
+          chatAppend("a", j.reply || "(空回复)");
+          chatHistory.push({ role: "assistant", content: j.reply || "" });
+          if (j.toolTrace && j.toolTrace.length) {
+            var names = [];
+            for (var i = 0; i < j.toolTrace.length; i++)
+              names.push(j.toolTrace[i].tool + (j.toolTrace[i].ok ? "" : "(失败)"));
+            chatAppend("sys", "工具：" + names.join(" → "));
+          }
+          if (j.lastConfirm) {
+            $("chatNeed").style.display = "";
+            $("chatNeed").textContent = "需要人工批准：请在面板确认抽屉中批准 " +
+              (j.lastConfirm.command || "") + "，然后再说“已批准/重试”。";
+          }
+          $("chatStatus").textContent = j.rounds ? ("rounds=" + j.rounds) : "";
+        } else {
+          var hint = (j && (j.hint || j.err_code || j.error)) || ("HTTP " + x.status);
+          chatAppend("err", "失败：" + hint);
+          $("chatStatus").textContent = "";
+        }
+      };
+      x.ontimeout = function () {
+        $("chatSend").disabled = false;
+        chatAppend("err", "请求超时（模型或工具链过慢）");
+        $("chatStatus").textContent = "";
+      };
+      x.onerror = function () {
+        $("chatSend").disabled = false;
+        chatAppend("err", "无法连接 hub-agent");
+        $("chatStatus").textContent = "";
+      };
+      x.send(JSON.stringify({ messages: chatHistory.slice(-20) }));
+    });
+  }
+
+  /* ---------------------------------------------------------- 启动 */
+  function initToken() {
+    var m = location.search.match(/[?&]token=([0-9a-fA-F]{8,128})/);
+    if (m) {
+      TOKEN = m[1];
+      /* L3：令牌一次性交付后立即从地址栏清除（防 shoulder-surf/历史记录） */
+      if (window.history && history.replaceState) history.replaceState(null, "", location.pathname);
+      else location.replace(location.pathname);
+      return true;
+    }
+    return false;
+  }
+
+  function init() {
+    if (!initToken()) {
+      $("noToken").style.display = "block";
+      $("topbar").style.display = "none";
+      $("tabs").style.display = "none";
+      $("main").style.display = "none";
+      $("logbar").style.display = "none";
+      $("logbox").style.display = "none";
+      return;
+    }
+    tick();
+    timer = window.setInterval(tick, POLL_MS);
+    window.setInterval(countdownTick, 1000);   /* b4：确认对话框秒级倒计时 */
+  }
+
+  if (window.addEventListener) window.addEventListener("load", init, false);
+  else window.onload = init;
+
+  /* 对外接口（onclick 内联绑定需要全局名） */
+  return {
+    op: op,
+    opIdx: opIdx,
+    autoIdx: autoIdx,
+    cmdIdx: cmdIdx,
+    verIdx: verIdx,            /* b4 四件套②：版本切换/回滚 */
+    verPickIdx: verPickIdx,    /* b4 修复：下拉进行中选择跨轮询保持 */
+    confirmTxn: confirmTxn,    /* b4 四件套①：确认对话框批准/拒绝 */
+    toggleCfmMin: toggleCfmMin,  /* M3e Q2：确认抽屉最小化/展开 */
+    omModeChanged: omModeChanged,/* M3e Q1：模式选择联动 ack 勾选 */
+    applyOpmode: applyOpmode,    /* M3e Q1：应用操作者模式 */
+    toggleLogPause: toggleLogPause,
+    showView: showView,
+    chatSend: chatSend,        /* M4d：对话 tab 发送 */
+    chatCfgToggle: chatCfgToggle,  /* M4d+：面板内模型设置 */
+    chatCfgSave: chatCfgSave,
+    confirmRisk: confirmRisk   /* G6 桩：M3 命令执行走 confirm/destructive 确认 */
+  };
+})();
+</script>
+</body>
+</html>

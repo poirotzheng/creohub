@@ -1,0 +1,15 @@
+# Documentation license
+
+The documentation in this directory (and in `docs/`) is licensed under the
+Creative Commons Attribution 4.0 International License (CC BY 4.0).
+
+You may share and adapt the documentation for any purpose, provided you give
+appropriate credit, link to the license, and indicate if changes were made.
+
+Full legal code: https://creativecommons.org/licenses/by/4.0/legalcode
+
+Attribution: "creo-hub documentation, Copyright 2026 CAST,
+licensed under CC BY 4.0."
+
+Note: source code is licensed under Apache-2.0 (see the repository root
+`LICENSE`); the CC BY 4.0 license applies to documentation text only.

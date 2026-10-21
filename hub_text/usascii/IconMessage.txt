@@ -1,0 +1,60 @@
+HubMenuLabel
+PLUGIN HUB M0
+#
+#
+HubBtnMount
+Mount Demo
+#
+#
+HubBtnMountHelp
+ProToolkitDllLoad: runtime-mount demo.dll
+#
+#
+HubBtnUnmount
+Unload Demo
+#
+#
+HubBtnUnmountHelp
+ProToolkitDllUnload: runtime-unload demo.dll
+#
+#
+HubBtnQuery
+Query Status
+#
+#
+HubBtnQueryHelp
+ProToolkitDllHandleGet: query demo mount status
+#
+#
+HubBtnMissing
+Mount Missing
+#
+#
+HubBtnMissingHelp
+Mount a nonexistent DLL (expect E_NOT_FOUND)
+#
+#
+HubBtnFail
+Mount FailVer
+#
+#
+HubBtnFailHelp
+Mount demo_fail.dll whose user_initialize always fails (expect USER_ABORT; click twice to record)
+#
+#
+HubBtnCycle
+Cycle x10
+#
+#
+HubBtnCycleHelp
+10 rounds of mount/unmount (T10 stability)
+#
+#
+HubBtnAbout
+About M0
+#
+#
+HubBtnAboutHelp
+Show version and log path
+#
+#

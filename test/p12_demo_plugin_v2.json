@@ -1,0 +1,54 @@
+{
+  "manifestVersion": 2,
+  "id": "demo",
+  "name": "Demo Plugin",
+  "version": "0.2.0",
+  "adapter": "ptk-sync",
+  "entry": "bin/demo.dll",
+  "textDir": "text",
+  "userDisplay": true,
+  "autoMount": true,
+  "commands": [
+    {
+      "id": "demo.hello",
+      "title": "Say Hello",
+      "desc": "弹出问候对话框（M1 演示命令）",
+      "descForLLM": "Read-only demo. Pops a greeting dialog in Creo. No arguments, no model changes, always succeeds when demo is ACTIVE.",
+      "risk": "safe",
+      "inputSchema": {
+        "type": "object",
+        "properties": {},
+        "additionalProperties": false
+      }
+    },
+    {
+      "id": "demo.export_summary",
+      "title": "Export summary",
+      "desc": "导出当前会话摘要到文件（示例契约，M2 不执行）",
+      "descForLLM": "Writes a session summary file under the plugin directory. Irreversible file emission: requires confirm gate in M3. Call list-first commands to ground model names.",
+      "risk": "confirm",
+      "timeoutSec": 20,
+      "reversible": false,
+      "idempotent": true,
+      "inputSchema": {
+        "type": "object",
+        "properties": {
+          "format": {
+            "type": "string",
+            "description": "输出格式",
+            "enum": ["json", "md"]
+          },
+          "includeStats": {
+            "type": "boolean",
+            "description": "是否包含统计段"
+          }
+        },
+        "required": ["format"],
+        "additionalProperties": false
+      }
+    }
+  ],
+  "requires": [],
+  "provides": ["demo.greeting"],
+  "host": { "creo": "6.0" }
+}

@@ -1,0 +1,18 @@
+# creo-hub DSH bundle patch
+#
+# Installed by DSH's install_bundle from a local path or tarball.
+# Replace <REPO_ROOT> with the absolute path of your creo-hub checkout.
+- insert:
+    - id: creohub-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: creohub
+        transport: stdio
+        command: node
+        args: ['<REPO_ROOT>/bridge/bridge.mjs']
+        env:
+          CREO_HUB_ROOT: '<REPO_ROOT>'
+        toolCallTimeoutMs: 20000
+        failOnStartupError: false
+        reconnect:
+          enabled: true

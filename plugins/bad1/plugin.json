@@ -1,0 +1,6 @@
+{
+  "manifestVersion": 1,
+  "name": "Bad Plugin One",
+  "adapter": "ptk-sync",
+  "note": "intentionally broken manifest for M1 validator test (S8): missing id and entry"
+}

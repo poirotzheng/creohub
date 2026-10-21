@@ -1,0 +1,8 @@
+DemoFailLabel
+DEMOFAIL
+#
+#
+DemoFailHelp
+This plugin always fails to initialize (error injection test)
+#
+#

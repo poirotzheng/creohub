@@ -1,0 +1,36 @@
+---
+name: Bug report
+about: Report a defect in creo-hub
+title: "[bug] "
+labels: ["bug"]
+assignees: []
+---
+
+## Environment
+
+- creo-hub version (`VERSION` or health endpoint):
+- Creo version/build:
+- Windows version:
+- Node.js version (if bridge/agent):
+- Install method (release installer / source build):
+
+## What happened
+
+<!-- Concise description. Attach logs if possible. -->
+
+## Steps to reproduce
+
+1.
+2.
+3.
+
+## Expected behavior
+
+## Diagnostics
+
+Paste the output of `deploy\doctor.cmd` and relevant `logs\hub*.log` lines.
+**Remove tokens, API keys, and customer data before posting.**
+
+## Additional context
+
+<!-- Screenshots, plugin id/version, whether the plugin was third-party. -->

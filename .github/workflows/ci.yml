@@ -1,0 +1,73 @@
+name: ci
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  node-gates:
+    name: node gates (offline)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Version consistency
+        shell: pwsh
+        run: node tools/check_version.mjs
+
+      - name: Manifest lint (golden)
+        shell: cmd
+        run: test\run_manifest_lint.cmd
+
+      - name: Pack gate (plugin_pack)
+        shell: cmd
+        run: test\run_pack_test.cmd
+
+      - name: Agent gate (mock hub + fake LLM)
+        shell: cmd
+        run: test\run_agent_test.cmd
+
+  hygiene:
+    name: repository hygiene
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Local paths / secrets scan (strict)
+        shell: pwsh
+        run: node tools/check_paths.mjs --strict
+
+      # Secret scanning is covered by tools/check_paths.mjs above (tokens/keys/
+      # private paths). The third-party gitleaks action is intentionally not
+      # used: it needs extra permissions/licensing and failed on the first run.
+
+  # The C build needs the proprietary PTC Pro/TOOLKIT SDK, which cannot be
+  # redistributed or installed on hosted runners. It is intentionally disabled
+  # here. Maintainers can run it on a self-hosted Windows runner with the SDK:
+  #   build\build.cmd && test\run_all.cmd
+  build-c:
+    name: c build + offline gates (self-hosted, manual)
+    if: false
+    runs-on: [self-hosted, windows, creo-toolkit]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Build
+        shell: cmd
+        run: build\build.cmd
+      - name: Gates
+        shell: cmd
+        run: test\run_all.cmd

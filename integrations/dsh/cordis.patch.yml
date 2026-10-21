@@ -1,0 +1,25 @@
+# =====================================================================
+# creo-hub MCP bridge - DSH profile patch
+#
+# 1. Replace <REPO_ROOT> with the absolute path of your creo-hub checkout
+#    (use forward slashes or doubled backslashes).
+# 2. Append this entry to %USERPROFILE%\.dsh\cordis.patch.yml
+# 3. Restart DSH; tools appear as mcp__creohub__* .
+#
+# A bare "id:" modifies an existing tree entry; new entries must be added
+# via "insert:" lists.
+# =====================================================================
+- insert:
+    - id: creohub-mcp
+      name: '@deepseek-ai/dsh-mcp-client'
+      config:
+        serverName: creohub
+        transport: stdio
+        command: node
+        args: ['<REPO_ROOT>/bridge/bridge.mjs']
+        env:
+          CREO_HUB_ROOT: '<REPO_ROOT>'
+        toolCallTimeoutMs: 20000
+        failOnStartupError: false
+        reconnect:
+          enabled: true

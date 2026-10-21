@@ -1,0 +1,5 @@
+# Template message file (M5 资源模块)
+# 抄改：文件改名 <你的id>_messages.txt；加菜单时在此定义标签，
+# 例如： MY_MENU_MYCMD My Command Label
+# 目录纪律：本文件必须位于 textDir\text\usascii\（Creo 自动追加 \text）。
+TPL_MENU Template

@@ -1,0 +1,12 @@
+Demo3MenuLabel
+DEMO3 M3A
+#
+#
+Demo3BtnLabel
+demo3 Status
+#
+#
+Demo3BtnHelp
+Show demo3 experiment plugin status (M3a E11 carrier)
+#
+#

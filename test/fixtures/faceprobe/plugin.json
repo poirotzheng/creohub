@@ -1,0 +1,23 @@
+{
+  "manifestVersion": 2,
+  "id": "faceprobe",
+  "name": "Face Probe (M3c c4 W-face, temporary)",
+  "version": "0.1.0",
+  "adapter": "ptk-sync",
+  "entry": "bin/faceprobe.dll",
+  "textDir": "text",
+  "userDisplay": false,
+  "autoMount": false,
+  "commands": [
+    {
+      "id": "faceprobe.ping",
+      "title": "Ping",
+      "desc": "face-only probe, never mounted",
+      "descForLLM": "Temporary registry-content probe for the L16 live tool-face demo; this package is NEVER mounted, so any call correctly answers 409 plugin-not-active. Its only purpose is to prove the DSH tool list grows/shrinks with registry content.",
+      "risk": "safe",
+      "idempotent": true,
+      "inputSchema": { "type": "object", "properties": {}, "additionalProperties": false }
+    }
+  ],
+  "host": { "creo": "6.0" }
+}

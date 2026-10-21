@@ -1,0 +1,160 @@
+[
+  {
+    "name": "p-call__ask",
+    "title": "p-call.ask",
+    "description": "Confirm-risk fixture: human-gated, panel optional; elicitation battery L",
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "note": {
+          "type": "string",
+          "description": "note to pass through"
+        }
+      },
+      "required": [
+        "note"
+      ]
+    }
+  },
+  {
+    "name": "p-call__echo",
+    "title": "p-call.echo",
+    "description": "Echo the arguments back verbatim; offline battery fixture",
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "msg": {
+          "type": "string",
+          "description": "message to echo"
+        }
+      },
+      "required": [
+        "msg"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "p-call__fail",
+    "title": "p-call.fail",
+    "description": "Always returns a staged business failure; offline battery fixture",
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true,
+      "idempotentHint": true
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "p-call__job",
+    "title": "p-call.job",
+    "description": "Async fixture (M4b): call answers 202 + jobId; poll GET /api/v1/jobs/<id> for the result",
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "p-call__nuke",
+    "title": "p-call.nuke",
+    "description": "Destructive fixture requiring human confirmation; nonce battery fixture",
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "target": {
+          "type": "string",
+          "description": "target name"
+        }
+      },
+      "required": [
+        "target"
+      ]
+    }
+  },
+  {
+    "name": "p-call__slow",
+    "title": "p-call.slow",
+    "description": "Sleeps ~2.5s before answering; 504/orphan battery fixture",
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  },
+  {
+    "name": "p-ok__hello",
+    "title": "p-ok.hello",
+    "description": "Say hello; takes no arguments",
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {},
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "p-ok__purge",
+    "title": "p-ok.purge",
+    "description": "Purge the plugin temp cache; irreversible",
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": false,
+      "destructiveHint": true,
+      "idempotentHint": true
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {
+        "dry": {
+          "type": "boolean",
+          "description": "dry run"
+        }
+      },
+      "required": [
+        "dry"
+      ]
+    }
+  },
+  {
+    "name": "p-ver__one",
+    "title": "p-ver.one",
+    "description": "versioned fixture command 1.0.0",
+    "annotations": {
+      "openWorldHint": false,
+      "readOnlyHint": true
+    },
+    "inputSchema": {
+      "type": "object",
+      "properties": {}
+    }
+  }
+]

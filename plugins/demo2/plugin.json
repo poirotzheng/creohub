@@ -1,0 +1,13 @@
+{
+  "manifestVersion": 1,
+  "id": "demo2",
+  "name": "Demo Two",
+  "version": "0.1.0",
+  "adapter": "ptk-sync",
+  "entry": "bin/demo2.dll",
+  "textDir": "text",
+  "userDisplay": true,
+  "autoMount": false,
+  "commands": [ { "id": "demo2.hello", "label": "Say Hello 2" } ],
+  "host": { "creo": "6.0" }
+}

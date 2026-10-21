@@ -1,0 +1,52 @@
+HubMenuLabel
+PLUGIN HUB M1
+#
+#
+HubBtnStatus
+Status Summary
+#
+#
+HubBtnStatusHelp
+List all plugins and states
+#
+#
+HubBtnMountAll
+Mount All (auto)
+#
+#
+HubBtnMountAllHelp
+Mount all autoMount plugins
+#
+#
+HubBtnUnloadAll
+Unload All
+#
+#
+HubBtnUnloadAllHelp
+Unmount all active plugins
+#
+#
+HubBtnSave
+Save State
+#
+#
+HubBtnSaveHelp
+Write hub_state.json now
+#
+#
+HubBtnRefresh
+Refresh Registry
+#
+#
+HubBtnRefreshHelp
+Rescan plugins directory
+#
+#
+HubBtnAbout
+About M1
+#
+#
+HubBtnAboutHelp
+Version and paths
+#
+#

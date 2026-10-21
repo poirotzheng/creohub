@@ -1,0 +1,1 @@
+{"manifestVersion":2,"id":"bad-undo-missing","adapter":"ptk-sync","entry":"bin/pkg.dll","textDir":"text","commands":[{"id":"bad-undo-missing.a","title":"T bad-undo-missing.a","desc":"d","descForLLM":"llm","risk":"safe","inputSchema":{"type":"object","properties":{}},"undoCommand":"bad-undo-missing.nope"}]}

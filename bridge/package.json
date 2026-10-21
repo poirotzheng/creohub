@@ -1,0 +1,20 @@
+{
+  "name": "creo-hub-bridge",
+  "version": "0.1.0",
+  "private": true,
+  "description": "MCP stdio bridge: exposes creo-hub management plane (status/manifest/plugins/mount/unmount/log) to DSH and any MCP host. Zero listening ports; token read fresh from <root>\\hub_token.txt per call; stateless.",
+  "type": "module",
+  "engines": {
+    "node": ">=18"
+  },
+  "bin": {
+    "creo-hub-bridge": "bridge.mjs"
+  },
+  "scripts": {
+    "start": "node bridge.mjs",
+    "test": "node test\\bridge_test.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "1.30.0"
+  }
+}

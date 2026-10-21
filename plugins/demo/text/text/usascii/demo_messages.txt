@@ -1,0 +1,12 @@
+DemoMenuLabel
+DEMO M1
+#
+#
+DemoBtnLabel
+Say Hello
+#
+#
+DemoBtnHelp
+Verify demo plugin command works (M1)
+#
+#
