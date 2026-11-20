@@ -1,5 +1,7 @@
 <img src="assets/CreoHub%20V1%20GitHub.png" width="200">
 
+---
+
 **CreoHub: an unofficial community tooling for Creo Parametric — not affiliated with, endorsed by, or sponsored by PTC Inc.**
 
 [![CI](https://github.com/poirotzheng/creo-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/poirotzheng/creo-hub/actions/workflows/ci.yml)
