@@ -1,27 +1,27 @@
-# CreoHub
+<img src="assets/CreoHub%20V1%20GitHub.png" width="200">
 
-**Unofficial community tooling for Creo Parametric — not affiliated with, endorsed by, or sponsored by PTC Inc.**
+**CreoHub: an unofficial community tooling for Creo Parametric — not affiliated with, endorsed by, or sponsored by PTC Inc.**
 
 [![CI](https://github.com/poirotzheng/creo-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/poirotzheng/creo-hub/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
 [![Release](https://img.shields.io/github/v/release/poirotzheng/creo-hub?include_prereleases)](https://github.com/poirotzheng/creo-hub/releases)
 
-creo-hub is a **plugin host and management plane for Creo Parametric 6.0**.
+CreoHub is a **plugin host and management plane for Creo Parametric 6.0**.
 It registers once with Creo, then lets you scan, mount, unmount, update and
 roll back Pro/TOOLKIT plugins **at runtime** — no more editing `protk.dat` and
 restarting Creo for every plugin.
 
 Every plugin capability is a **declared command** with a JSON schema, a risk
-level (`safe` / `confirm` / `destructive`) and an audit trail. Creo-hub exposes
+level (`safe` / `confirm` / `destructive`) and an audit trail. CreoHub exposes
 those commands over a token-protected loopback API, so panels, scripts and AI
 assistants (via MCP) can drive deterministic operations — never generated
 geometry.
 
 ![Panel](assets/screenshot-panel.png)
 
-## Why creo-hub
+## Why CreoHub
 
-| Problem | creo-hub |
+| Problem | CreoHub |
 |---|---|
 | Each plugin needs its own `protk.dat` entry and a Creo restart | One host registration; plugins are mounted/unmounted at runtime |
 | Plugin capabilities are opaque DLL exports | `plugin.json` v2 declares commands, schemas, risk, timeouts, undo |
@@ -198,7 +198,7 @@ Details: `SECURITY.md`.
 Source code: [Apache License 2.0](LICENSE). Documentation: [CC BY 4.0](docs/LICENSE).
 Third-party notices: [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
 
-Creo® is a trademark of PTC Inc. creo-hub is an independent open-source project
+Creo® is a trademark of PTC Inc. CreoHub is an independent open-source project
 and is not affiliated with, endorsed by, or sponsored by PTC Inc. See
 [TRADEMARKS.md](TRADEMARKS.md).
 
