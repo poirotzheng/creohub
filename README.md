@@ -1,4 +1,4 @@
-# creo-hub
+# CreoHub
 
 **Unofficial community tooling for Creo Parametric — not affiliated with, endorsed by, or sponsored by PTC Inc.**
 
