@@ -6,7 +6,7 @@
 
 [![CI](https://github.com/poirotzheng/creo-hub/actions/workflows/ci.yml/badge.svg)](https://github.com/poirotzheng/creo-hub/actions/workflows/ci.yml)
 [![License: Apache-2.0](https://img.shields.io/badge/license-Apache--2.0-blue.svg)](LICENSE)
-[![Release](https://img.shields.io/github/v/release/poirotzheng/creo-hub?include_prereleases)](https://github.com/poirotzheng/creo-hub/releases)
+[![Release](https://img.shields.io/github/v/release/poirotzheng/creohub?include_prereleases)](https://github.com/poirotzheng/creohub/releases)
 
 CreoHub is a **plugin host and management plane for Creo Parametric 6.0**.
 It registers once with Creo, then lets you scan, mount, unmount, update and
